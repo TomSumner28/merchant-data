@@ -1,5 +1,6 @@
-from flask import Flask, request, redirect, url_for, render_template, flash
+from flask import Flask, request, redirect, url_for, render_template, flash, session, abort
 from urllib.request import urlretrieve
+from tempfile import NamedTemporaryFile
 import os
 import sys
 
@@ -9,10 +10,19 @@ sys.path.insert(0, os.path.dirname(__file__))
 from simple_xlsx import read_workbook
 
 app = Flask(__name__)
-app.secret_key = 'secret'
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'change_me')
 
-# Store uploaded data in memory
-dashboard_data = {}
+# Store uploaded data keyed by session id
+user_data = {}
+
+
+def _get_session_id() -> str:
+    """Return a unique session id and ensure it exists."""
+    sid = session.get('sid')
+    if not sid:
+        sid = os.urandom(16).hex()
+        session['sid'] = sid
+    return sid
 
 # Public Google Sheets document containing the data
 GOOGLE_SHEET_URL = (
@@ -22,37 +32,44 @@ GOOGLE_SHEET_URL = (
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    _get_session_id()
+    token = os.urandom(16).hex()
+    session['_csrf_token'] = token
+    return render_template('index.html', csrf_token=token)
 
 
 @app.route('/load')
 def load():
     """Fetch the Google Sheet and redirect to dashboard."""
-    global dashboard_data
-    tmp_path = '/tmp/google_sheet.xlsx'
+    sid = _get_session_id()
+    tmp = NamedTemporaryFile(delete=False, suffix='.xlsx')
+    tmp_path = tmp.name
     try:
         urlretrieve(GOOGLE_SHEET_URL, tmp_path)
-        dashboard_data = read_workbook(tmp_path)
+        user_data[sid] = read_workbook(tmp_path)
         flash('Data loaded from Google Sheets.')
     except Exception as e:
         flash(f'Failed to load Google Sheet: {e}')
-        dashboard_data = {}
+        user_data[sid] = {}
     return redirect(url_for('dashboard'))
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    global dashboard_data
+    sid = _get_session_id()
+    if session.pop('_csrf_token', None) != request.form.get('csrf_token'):
+        abort(400)
     file = request.files.get('file')
     if not file or file.filename == '':
         flash('No file selected')
         return redirect(url_for('index'))
-    path = '/tmp/upload.xlsx'
-    file.save(path)
+    with NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp:
+        file.save(tmp.name)
+        path = tmp.name
     try:
-        dashboard_data = read_workbook(path)
+        user_data[sid] = read_workbook(path)
     except Exception as e:
         flash(f'Failed to parse file: {e}')
-        dashboard_data = {}
+        user_data[sid] = {}
     return redirect(url_for('dashboard'))
 
 
@@ -76,8 +93,10 @@ def _compute_stats(rows):
 
 @app.route('/dashboard')
 def dashboard():
-    merchant_data = dashboard_data.get('merchant list', [])
-    offs_data = dashboard_data.get('offs list', [])
+    sid = _get_session_id()
+    data = user_data.get(sid, {})
+    merchant_data = data.get('merchant list', [])
+    offs_data = data.get('offs list', [])
     stats = _compute_stats(merchant_data)
     return render_template(
         'dashboard.html',
@@ -89,7 +108,9 @@ def dashboard():
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    merchant_data = dashboard_data.get('merchant list', [])
+    sid = _get_session_id()
+    data = user_data.get(sid, {})
+    merchant_data = data.get('merchant list', [])
     question = request.form.get('question', '')
     answer = _answer_question(merchant_data, question)
     return {'answer': answer}

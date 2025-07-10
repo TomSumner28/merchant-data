@@ -6,6 +6,8 @@ This repository contains a simple Flask dashboard for viewing merchant data. By 
 
 The project relies only on the Python standard library and `flask`. If `flask` is not available in your environment, install it locally.
 
+Set `FLASK_SECRET_KEY` in your environment for session security. A default value is used if not provided.
+
 ## Running the app
 
 ```
@@ -15,6 +17,7 @@ The script automatically adjusts the Python path so it can be executed from the
 repository root without additional configuration.
 
 Then open `http://localhost:5000` in your browser. Click “Load data from Google Sheets” to fetch the workbook and view the dashboard, or upload your own file.
+The upload form includes a basic CSRF token for protection.
 
 ## Limitations
 
