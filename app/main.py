@@ -1,4 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template, flash
+from urllib.request import urlretrieve
+
 from simple_xlsx import read_workbook
 
 app = Flask(__name__)
@@ -7,9 +9,30 @@ app.secret_key = 'secret'
 # Store uploaded data in memory
 dashboard_data = {}
 
+# Public Google Sheets document containing the data
+GOOGLE_SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "1Np_YQejqfgoW9Se3g6hZnrmmcEu32TrFNF78Z3MxnBA/export?format=xlsx"
+)
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/load')
+def load():
+    """Fetch the Google Sheet and redirect to dashboard."""
+    global dashboard_data
+    tmp_path = '/tmp/google_sheet.xlsx'
+    try:
+        urlretrieve(GOOGLE_SHEET_URL, tmp_path)
+        dashboard_data = read_workbook(tmp_path)
+        flash('Data loaded from Google Sheets.')
+    except Exception as e:
+        flash(f'Failed to load Google Sheet: {e}')
+        dashboard_data = {}
+    return redirect(url_for('dashboard'))
 
 @app.route('/upload', methods=['POST'])
 def upload():

@@ -4,7 +4,9 @@
     <title>Merchant Dashboard</title>
 </head>
 <body>
-    <h1>Upload Merchant Excel</h1>
+    <h1>Merchant Dashboard</h1>
+    <p><a href="{{ url_for('load') }}">Load data from Google Sheets</a></p>
+    <h2>Or upload Excel file</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul>

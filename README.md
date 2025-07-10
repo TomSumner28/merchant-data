@@ -1,6 +1,6 @@
 # merchant-data
 
-This repository contains a simple Flask dashboard for viewing merchant data from an uploaded Excel workbook. The workbook should contain two sheets named **"merchant list"** and **"offs list"**. Statistics are calculated from the merchant list sheet.
+This repository contains a simple Flask dashboard for viewing merchant data. By default it downloads the merchant workbook directly from a public Google Sheet, but you can also upload an Excel file if desired. The workbook should contain two sheets named **"merchant list"** and **"offs list"**. Statistics are calculated from the merchant list sheet.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ The project relies only on the Python standard library and `flask`. If `flask` i
 python3 app/main.py
 ```
 
-Then open `http://localhost:5000` in your browser to upload a workbook and view the dashboard.
+Then open `http://localhost:5000` in your browser. Click “Load data from Google Sheets” to fetch the workbook and view the dashboard, or upload your own file.
 
 ## Limitations
 
