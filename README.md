@@ -22,9 +22,13 @@ Then open `http://localhost:5000` in your browser. Click “Load data from Googl
 The upload form includes a basic CSRF token for protection. Ensure the environment variables mentioned above are set so the sheet can be retrieved.
 
 If you only want to preview the design without running the Flask server, open
-`static/index.html` in your browser. It links to a sample dashboard page with
+`index.html` in your browser. It links to a sample dashboard page with
 placeholder data so you can verify the site deploys correctly before enabling
-the back-end logic.
+the back-end logic. These HTML files can also be deployed as a static site.
+
+For example, the repository includes a `vercel.json` configuration so the
+contents can be hosted on Vercel without Next.js. Deployment will serve
+`index.html` and `dashboard.html` directly.
 
 ## Limitations
 

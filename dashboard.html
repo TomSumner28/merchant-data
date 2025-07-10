@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    header { margin-bottom: 20px; }
+    .stats ul { list-style: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Merchant Dashboard</h1>
+    <form id="ask-form" action="#" method="post">
+      <input type="text" name="question" placeholder="Ask a question" disabled>
+      <button type="submit" disabled>Ask</button>
+    </form>
+  </header>
+
+  <section class="stats">
+    <h2>Stats (Sample Data)</h2>
+    <p>Total merchants: 150</p>
+    <p>Lost rate: 5%</p>
+    <h3>Deal Stage Counts</h3>
+    <ul>
+      <li>Lead: 50</li>
+      <li>Negotiation: 30</li>
+      <li>Live: 60</li>
+      <li>Lost: 10</li>
+    </ul>
+    <h3>Region Counts</h3>
+    <ul>
+      <li>USA: 80</li>
+      <li>Europe: 40</li>
+      <li>APAC: 30</li>
+    </ul>
+  </section>
+
+  <p><em>This page contains static example data. Dynamic functionality will be connected later.</em></p>
+</body>
+</html>
