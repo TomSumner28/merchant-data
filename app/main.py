@@ -25,10 +25,29 @@ def _get_session_id() -> str:
     return sid
 
 # Public Google Sheets document containing the data
-GOOGLE_SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/"
-    "1Np_YQejqfgoW9Se3g6hZnrmmcEu32TrFNF78Z3MxnBA/export?format=xlsx"
-)
+# The sheet ID and API key can be provided via environment variables so
+# private sheets can be accessed.  If not set, a demo sheet is used.
+SHEET_ID = os.getenv("GOOGLE_SHEETS_ID")
+API_KEY = os.getenv("GOOGLE_API_KEY")
+
+if SHEET_ID:
+    if API_KEY:
+        GOOGLE_SHEET_URL = (
+            "https://www.googleapis.com/drive/v3/files/"
+            f"{SHEET_ID}/export?mimeType="
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            f"&key={API_KEY}"
+        )
+    else:
+        GOOGLE_SHEET_URL = (
+            "https://docs.google.com/spreadsheets/d/"
+            f"{SHEET_ID}/export?format=xlsx"
+        )
+else:
+    GOOGLE_SHEET_URL = (
+        "https://docs.google.com/spreadsheets/d/"
+        "1Np_YQejqfgoW9Se3g6hZnrmmcEu32TrFNF78Z3MxnBA/export?format=xlsx"
+    )
 
 @app.route('/')
 def index():
