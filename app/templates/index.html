@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+    <title>Merchant Dashboard</title>
+</head>
+<body>
+    <h1>Merchant Dashboard</h1>
+    <p><a href="{{ url_for('load') }}">Load data from Google Sheets</a></p>
+    <h2>Or upload Excel file</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>

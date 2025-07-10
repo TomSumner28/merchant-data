@@ -1,2 +1,21 @@
 # merchant-data
-Data reporting for TRC merchants
+
+This repository contains a simple Flask dashboard for viewing merchant data. By default it downloads the merchant workbook directly from a public Google Sheet, but you can also upload an Excel file if desired. The workbook should contain two sheets named **"merchant list"** and **"offs list"**. Statistics are calculated from the merchant list sheet.
+
+## Requirements
+
+The project relies only on the Python standard library and `flask`. If `flask` is not available in your environment, install it locally.
+
+## Running the app
+
+```
+python3 app/main.py
+```
+The script automatically adjusts the Python path so it can be executed from the
+repository root without additional configuration.
+
+Then open `http://localhost:5000` in your browser. Click “Load data from Google Sheets” to fetch the workbook and view the dashboard, or upload your own file.
+
+## Limitations
+
+A minimal Excel reader is included (`simple_xlsx.py`). It supports basic cell types but may not handle all Excel features. For large workbooks, performance may be limited.
