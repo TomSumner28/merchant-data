@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Merchant Dashboard Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    header { margin-bottom: 20px; }
+    .upload { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Merchant Dashboard</h1>
+    <p>This static page demonstrates the upload form and layout before back-end integration.</p>
+  </header>
+  <section class="upload">
+    <h2>Upload Excel Workbook</h2>
+    <form action="#" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" accept=".xlsx">
+      <input type="submit" value="Upload" disabled>
+    </form>
+    <p><em>The upload button is disabled in this demo.</em></p>
+  </section>
+  <section>
+    <p>After uploading the workbook, you would be redirected to a dashboard similar to <a href="dashboard.html">this example</a>.</p>
+  </section>
+</body>
+</html>

@@ -19,6 +19,11 @@ repository root without additional configuration.
 Then open `http://localhost:5000` in your browser. Click “Load data from Google Sheets” to fetch the workbook and view the dashboard, or upload your own file.
 The upload form includes a basic CSRF token for protection.
 
+If you only want to preview the design without running the Flask server, open
+`static/index.html` in your browser. It links to a sample dashboard page with
+placeholder data so you can verify the site deploys correctly before enabling
+the back-end logic.
+
 ## Limitations
 
 A minimal Excel reader is included (`simple_xlsx.py`). It supports basic cell types but may not handle all Excel features. For large workbooks, performance may be limited.
