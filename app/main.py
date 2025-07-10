@@ -1,4 +1,13 @@
-from flask import Flask, request, redirect, url_for, render_template, flash, session, abort
+from flask import (
+    Flask,
+    request,
+    redirect,
+    url_for,
+    render_template,
+    flash,
+    session,
+    abort,
+)
 from urllib.request import urlretrieve
 from tempfile import NamedTemporaryFile
 import os
@@ -49,23 +58,33 @@ else:
         "1Np_YQejqfgoW9Se3g6hZnrmmcEu32TrFNF78Z3MxnBA/export?format=xlsx"
     )
 
+
+def _fetch_sheet() -> dict:
+    """Download the Google Sheet and return parsed workbook data."""
+    tmp = NamedTemporaryFile(delete=False, suffix=".xlsx")
+    tmp_path = tmp.name
+    urlretrieve(GOOGLE_SHEET_URL, tmp_path)
+    return read_workbook(tmp_path)
+
 @app.route('/')
 def index():
-    _get_session_id()
-    token = os.urandom(16).hex()
-    session['_csrf_token'] = token
-    return render_template('index.html', csrf_token=token)
+    """Load data from Google Sheets and show the dashboard."""
+    sid = _get_session_id()
+    try:
+        user_data[sid] = _fetch_sheet()
+        flash("Data loaded from Google Sheets.")
+    except Exception as e:
+        flash(f"Failed to load Google Sheet: {e}")
+        user_data[sid] = {}
+    return redirect(url_for("dashboard"))
 
 
 @app.route('/load')
 def load():
     """Fetch the Google Sheet and redirect to dashboard."""
     sid = _get_session_id()
-    tmp = NamedTemporaryFile(delete=False, suffix='.xlsx')
-    tmp_path = tmp.name
     try:
-        urlretrieve(GOOGLE_SHEET_URL, tmp_path)
-        user_data[sid] = read_workbook(tmp_path)
+        user_data[sid] = _fetch_sheet()
         flash('Data loaded from Google Sheets.')
     except Exception as e:
         flash(f'Failed to load Google Sheet: {e}')
