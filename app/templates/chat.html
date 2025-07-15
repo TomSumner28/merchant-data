@@ -3,7 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>The Reward Collection GPT</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJ7MGDz3I1kuui9rK/3HB+7ENqQkDoDib0yV0=" crossorigin="anonymous"></script>
+  <script>
+    // minimal helper for POSTing without external dependencies
+    async function postForm(action, data) {
+      const resp = await fetch(action, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams(data),
+      });
+      return resp.json();
+    }
+  </script>
   <style>
     body { background:#111; color:#eee; font-family: Arial, sans-serif; padding:2rem; }
     h1 { color:#0ff; }
@@ -30,15 +40,17 @@
     {% endfor %}
   </div>
   <script>
-    $('#chat-form').on('submit', function(e){
+    document.getElementById('chat-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const text = $('textarea[name=message]').val();
-      $.post($(this).attr('action'), $(this).serialize(), function(data){
-        $('#chat').append('<div class="msg user">user: '+text+'</div>');
-        $('#chat').append('<div class="msg assistant">assistant: '+data.answer+'</div>');
-        $('#answer').text(data.answer);
-        $('textarea[name=message]').val('');
-      });
+      const form = e.target;
+      const text = form.message.value;
+      const csrf = form.csrf_token.value;
+      const data = await postForm(form.action, {message: text, csrf_token: csrf});
+      const chat = document.getElementById('chat');
+      chat.insertAdjacentHTML('beforeend', `<div class="msg user">user: ${text}</div>`);
+      chat.insertAdjacentHTML('beforeend', `<div class="msg assistant">assistant: ${data.answer}</div>`);
+      document.getElementById('answer').textContent = data.answer;
+      form.message.value = '';
     });
   </script>
 </body>

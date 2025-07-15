@@ -21,7 +21,7 @@ Then run:
 python3 app/main.py
 ```
 
-Open `http://localhost:5000` in your browser to start chatting.  The conversation history is stored in your session so you can ask follow‑up questions.
+Open `http://localhost:5000` in your browser to start chatting.  A multi‑line textarea lets you draft longer questions and answers appear directly below the form so the conversation stays on a single page. The conversation history is stored in your session so you can ask follow‑up questions.
 
 The app will automatically retry if the OpenAI API returns a rate limit error. If you keep seeing "Too Many Requests" make sure your API key has sufficient quota.
 
