@@ -3,8 +3,22 @@
 <head>
   <meta charset="utf-8">
   <title>The Reward Collection GPT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/style.css">
+  <script>
+    function toggleMode() {
+      const b = document.body;
+      b.classList.toggle('light-mode');
+      b.classList.toggle('dark-mode');
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('dark-mode');
+    });
+  </script>
 </head>
-<body>
+<body class="dark-mode">
   <h1>The Reward Collection GPT</h1>
   <p>This is a static placeholder. Deploy the Flask app to use the chat interface.</p>
 </body>

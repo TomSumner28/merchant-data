@@ -3,15 +3,10 @@
 <head>
   <meta charset="utf-8">
   <title>The Reward Collection GPT</title>
-  <style>
-    body { margin:0; font-family: Arial, sans-serif; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:0.5rem 1rem; background:#222; color:#fff; }
-    nav a { color:inherit; margin-right:1rem; text-decoration:none; }
-    main { padding:2rem; }
-    .dark-mode { background:#111; color:#eee; }
-    .light-mode { background:#fff; color:#000; }
-    button.mode { background:#0ff; border:none; padding:0.3rem 0.6rem; color:#000; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script>
     function toggleMode() {
       const b = document.body;

@@ -3,12 +3,24 @@
 <head>
   <meta charset="utf-8">
   <title>The Reward Collection GPT</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background:#111; color:#eee; }
-    h1 { color:#ff4081; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/style.css">
+  <script>
+    function toggleMode() {
+      const b = document.body;
+      b.classList.toggle('light-mode');
+      b.classList.toggle('dark-mode');
+      localStorage.setItem('mode', b.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const mode = localStorage.getItem('mode') || 'dark';
+      document.body.classList.add(mode + '-mode');
+    });
+  </script>
 </head>
-<body>
+<body class="dark-mode">
   <h1>The Reward Collection GPT</h1>
   <p>This is a static fallback page. Deploy the Flask app to enable live chat powered by OpenAI.</p>
 </body>

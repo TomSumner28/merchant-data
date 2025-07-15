@@ -1,0 +1,10 @@
+body { margin:0; font-family:'Poppins', sans-serif; }
+header { display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; background:linear-gradient(90deg,#0f172a,#172554); color:#fff; }
+nav a { color:#fff; margin-right:1.5rem; text-decoration:none; font-weight:500; }
+nav a:hover { text-decoration:underline; }
+main { padding:2rem; }
+.dark-mode { background:#0f172a; color:#e2e8f0; }
+.light-mode { background:#fff; color:#1e293b; }
+button.mode { background:#38bdf8; border:none; color:#000; padding:0.4rem 0.8rem; border-radius:4px; cursor:pointer; }
+.btn{background:#38bdf8;border:none;color:#000;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;}
+textarea{background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:.5rem;border-radius:4px;width:100%;} form.chat{max-width:600px;margin:auto;display:flex;flex-direction:column;gap:.5rem;}

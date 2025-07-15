@@ -1,6 +1,6 @@
 # The Reward Collection GPT
 
-This repository contains a tiny Flask application that wraps the OpenAI ChatGPT API in a TRC branded interface.  It lets your team chat with GPT right from a simple web page.
+This repository contains a tiny Flask application that wraps the OpenAI ChatGPT API in a TRC branded interface. It lets your team chat with GPT right from a simple web page. The layout now mirrors the design used on [forecasting.therewardcollection.com](https://forecasting.therewardcollection.com) with a gradient banner and Poppins typography.
 
 ## Setup
 
