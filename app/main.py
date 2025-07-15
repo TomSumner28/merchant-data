@@ -131,8 +131,13 @@ def _compute_stats(rows):
         'total': len(rows),
         'deal_stage_counts': {},
         'region_counts': {},
+        'sales_rep_counts': {},
         'lost_count': 0,
+        'live_count': 0,
+        'lost_per_region': {},
+        'live_per_region': {},
         'avg_cashback_live': 0.0,
+        'avg_cashback_per_region': {},
         'sales_rep_live_counts': {},
     }
     cashback_total = 0.0
@@ -140,20 +145,33 @@ def _compute_stats(rows):
     for row in rows:
         stage = row.get('deal_stage', 'Unknown')
         region = row.get('region', 'Unknown')
+        rep = row.get('sales_rep', 'Unknown')
         stats['deal_stage_counts'][stage] = stats['deal_stage_counts'].get(stage, 0) + 1
         stats['region_counts'][region] = stats['region_counts'].get(region, 0) + 1
+        stats['sales_rep_counts'][rep] = stats['sales_rep_counts'].get(rep, 0) + 1
         if stage.lower() in {'lost', 'churn', 'churned'}:
             stats['lost_count'] += 1
+            stats['lost_per_region'][region] = stats['lost_per_region'].get(region, 0) + 1
         if stage.lower() == 'live':
             rep = row.get('sales_rep', 'Unknown')
             stats['sales_rep_live_counts'][rep] = stats['sales_rep_live_counts'].get(rep, 0) + 1
+            stats['live_count'] += 1
+            stats['live_per_region'][region] = stats['live_per_region'].get(region, 0) + 1
             cb = _to_float(row.get('cashback', row.get('cashback_amount')))
             if cb is not None:
                 cashback_total += cb
                 cashback_count += 1
+                region_entry = stats['avg_cashback_per_region'].setdefault(region, {'sum': 0.0, 'count': 0})
+                region_entry['sum'] += cb
+                region_entry['count'] += 1
     stats['lost_rate'] = (stats['lost_count'] / stats['total']) * 100 if stats['total'] else 0
     if cashback_count:
         stats['avg_cashback_live'] = cashback_total / cashback_count
+    for region, val in stats['avg_cashback_per_region'].items():
+        if val['count']:
+            stats['avg_cashback_per_region'][region] = val['sum'] / val['count']
+        else:
+            stats['avg_cashback_per_region'][region] = 0.0
     return stats
 
 

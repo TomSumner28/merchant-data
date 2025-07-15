@@ -48,6 +48,9 @@
     <canvas id="dealStageChart"></canvas>
     <canvas id="regionChart"></canvas>
     <canvas id="salesRepChart"></canvas>
+    <canvas id="liveRegionChart"></canvas>
+    <canvas id="lostRegionChart"></canvas>
+    <canvas id="repTotalChart"></canvas>
   </section>
 
   <p><em>This page contains static example data. Dynamic functionality will be connected later.</em></p>
@@ -56,6 +59,9 @@
     const stageData = { Lead: 50, Negotiation: 30, Live: 60, Lost: 10 };
     const regionData = { USA: 80, Europe: 40, APAC: 30 };
     const repData = { Lucy: 25, Sam: 20, Ash: 15 };
+    const liveRegionData = { USA: 30, Europe: 20, APAC: 10 };
+    const lostRegionData = { USA: 5, Europe: 3, APAC: 2 };
+    const repTotalData = { Lucy: 40, Sam: 35, Ash: 25 };
 
     new Chart(document.getElementById('dealStageChart'), {
       type: 'bar',
@@ -93,6 +99,42 @@
           label: 'Live retailers per rep',
           data: Object.values(repData),
           backgroundColor: 'rgba(153, 102, 255, 0.5)'
+        }]
+      }
+    });
+
+    new Chart(document.getElementById('liveRegionChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(liveRegionData),
+        datasets: [{
+          label: 'Live by region',
+          data: Object.values(liveRegionData),
+          backgroundColor: 'rgba(75, 192, 192, 0.5)'
+        }]
+      }
+    });
+
+    new Chart(document.getElementById('lostRegionChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(lostRegionData),
+        datasets: [{
+          label: 'Lost by region',
+          data: Object.values(lostRegionData),
+          backgroundColor: 'rgba(255, 99, 132, 0.5)'
+        }]
+      }
+    });
+
+    new Chart(document.getElementById('repTotalChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(repTotalData),
+        datasets: [{
+          label: 'Total merchants per rep',
+          data: Object.values(repTotalData),
+          backgroundColor: 'rgba(201, 203, 207, 0.5)'
         }]
       }
     });

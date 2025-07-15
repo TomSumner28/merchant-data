@@ -12,6 +12,7 @@ pip install -r requirements.txt
 ```
 
 Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private. When both are provided the app downloads the file using the Google Drive API.
+If these variables are not set the dashboard uses the public TRC Master List for demonstration purposes.
 
 Set `FLASK_SECRET_KEY` in your environment for session security. A default value is used if not provided.
 
@@ -47,6 +48,9 @@ The dashboard presents several visual reports:
 - Number of merchants in each deal stage
 - Merchants per region
 - Live merchants per sales rep
+- Live and lost counts by region
+- Total merchants per sales rep
+- Average cashback per region
 - Average cashback across live merchants
 
 Charts are rendered using Chart.js and an AI question bar lets you ask quick
