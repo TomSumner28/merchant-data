@@ -45,6 +45,13 @@ def _generate_csrf_token() -> str:
 
 app.jinja_env.globals['csrf_token'] = _generate_csrf_token
 
+
+@app.route('/favicon.ico')
+@app.route('/favicon.png')
+def favicon():
+    """Return an empty 204 response for missing favicons."""
+    return ('', 204)
+
 def _sheet_url() -> str:
     """Return the URL to download the configured Google Sheet."""
     full_url = os.getenv("GOOGLE_SHEET_URL")
