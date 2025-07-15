@@ -1,32 +1,20 @@
-# The Reward Collection GPT Dashboard
+# merchant-data
 
-This Flask app lets your team upload the TRC master Excel workbook and explore key metrics in a TRC‑branded interface. It also includes a simple AI bar for natural‑language questions with a fallback to OpenAI if a query cannot be answered directly.
+This repository contains a simple Flask dashboard for viewing merchant data from an uploaded Excel workbook. The workbook should contain two sheets named **"merchant list"** and **"offs list"**. Statistics are calculated from the merchant list sheet.
 
-## Setup
+## Requirements
 
-Install Flask with the requirements file:
+The project relies only on the Python standard library and `flask`. If `flask` is not available in your environment, install it locally.
+Set a `FLASK_SECRET_KEY` environment variable to secure session data.
 
-```bash
-pip install -r requirements.txt
+## Running the app
+
 ```
-
-Set the following environment variables before running:
-
-- `OPENAI_API_KEY` – optional, enables GPT fallback
-- `FLASK_SECRET_KEY` – secret used for session cookies
-
-Start the server with:
-
-```bash
 python3 app/main.py
 ```
 
-Open `http://localhost:5000` to upload your workbook. Once uploaded you can view the dashboard and ask questions such as *"How many live merchants does Lucy have?"* or *"What is the average cashback?"*.
+Then open `http://localhost:5000` in your browser to upload a workbook and view the dashboard.
 
-## Files
+## Limitations
 
-- `app/main.py` – Flask routes and helpers
-- `app/simple_xlsx.py` – tiny Excel parser using the Python standard library
-- `app/templates/` – Jinja2 templates for the interface
-- `static/style.css` – shared styles with light/dark modes
-- `vercel.json` – configuration for deploying to Vercel
+A minimal Excel reader is included (`simple_xlsx.py`). It supports basic cell types but may not handle all Excel features. For large workbooks, performance may be limited.
