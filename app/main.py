@@ -75,7 +75,10 @@ def _fetch_sheet() -> dict:
     """Download the Google Sheet and return parsed workbook data."""
     tmp = NamedTemporaryFile(delete=False, suffix=".xlsx")
     tmp_path = tmp.name
-    urlretrieve(GOOGLE_SHEET_URL, tmp_path)
+    try:
+        urlretrieve(GOOGLE_SHEET_URL, tmp_path)
+    except Exception as e:
+        raise RuntimeError(f"Download failed: {e}")
     return read_workbook(tmp_path)
 
 @app.route('/')
@@ -157,7 +160,15 @@ def _compute_stats(rows):
 @app.route('/dashboard')
 def dashboard():
     sid = _get_session_id()
-    data = user_data.get(sid, {})
+    data = user_data.get(sid)
+    if not data:
+        try:
+            user_data[sid] = _fetch_sheet()
+            flash('Data loaded from Google Sheets.')
+            data = user_data[sid]
+        except Exception as e:
+            flash(f'Failed to load Google Sheet: {e}')
+            data = {}
     merchant_data = data.get('merchant list', [])
     offs_data = data.get('offs list', [])
     stats = _compute_stats(merchant_data)

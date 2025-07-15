@@ -54,9 +54,11 @@ the back-end logic. These HTML files can also be deployed as a static site.
 Deploying `index.html` and `dashboard.html` to a service such as Vercel will
 give you a read-only preview of the interface without any back‑end.
 
-For example, the repository includes a `vercel.json` configuration so the
-contents can be hosted on Vercel without Next.js. Deployment will serve
-`index.html` and `dashboard.html` directly.
+For a simple design preview the repository includes a `vercel.json` file that
+serves the static HTML only. If you want the full Flask back‑end in Vercel,
+replace that configuration with one that builds `app/main.py` using the Vercel
+Python runtime and sets the environment variables above so the Google Sheet is
+loaded.
 
 ## Limitations
 

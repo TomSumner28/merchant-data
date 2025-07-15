@@ -1,7 +1,4 @@
 {
-  "builds": [{"src": "*.html", "use": "@vercel/static"}],
-  "routes": [
-    {"src": "/", "dest": "/index.html"},
-    {"src": "/dashboard", "dest": "/dashboard.html"}
-  ]
+  "builds": [{"src": "app/main.py", "use": "@vercel/python"}],
+  "routes": [{"src": "/(.*)", "dest": "app/main.py"}]
 }
