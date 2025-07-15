@@ -1,24 +1,28 @@
-# The Reward Collection GPT
+# Merchant Dashboard with AI Search
 
-This project provides a small Flask application that turns your website into a branded ChatGPT interface. Users can type questions and receive responses from OpenAI's GPT model. Conversation history is stored in the session so each visitor gets a personal chat experience.
+This project provides a small Flask application that lets you upload a workbook and view key metrics in a dashboard. An AI powered search box lets you ask natural-language questions about your data.
 
 ## Requirements
 
-Only `flask` from PyPI is required. Install it with:
+Install Flask (and optionally pycurl for HTTPS performance) using the provided requirements file:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Set `OPENAI_API_KEY` in your environment and optionally `FLASK_SECRET_KEY` for session security. Then run:
+Set the following environment variables:
+
+- `OPENAI_API_KEY` – required for the AI question feature
+- `FLASK_SECRET_KEY` – secret used for session cookies
+
+Then start the app:
 
 ```bash
 python3 app/main.py
 ```
 
-Open `http://localhost:5000` in your browser to start chatting.
+Visit `http://localhost:5000` to upload your workbook (`.xlsx`). After uploading you will be redirected to the dashboard.
 
 ### Deployment
 
-The repository includes a `vercel.json` file so the app can be deployed to Vercel. Configure `OPENAI_API_KEY` (and optionally `FLASK_SECRET_KEY`) as environment variables in your Vercel project. All requests will be served by the Flask function defined in `api/index.py`.
-
+The repository includes a `vercel.json` file so the Flask app can be deployed to Vercel. Configure the environment variables mentioned above in your Vercel project and deploy normally. All HTTP requests will be routed to the Flask application via `api/index.py`.
