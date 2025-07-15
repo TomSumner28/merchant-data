@@ -11,7 +11,7 @@
     .msg { margin-bottom:1rem; }
     .user { color:#0ff; }
     .assistant { color:#ff4081; }
-    input[type=text] { width:70%; background:#222; border:1px solid #555; color:#eee; padding:.5rem; }
+    textarea { width:70%; background:#222; border:1px solid #555; color:#eee; padding:.5rem; height:6rem; }
     button { padding:.5rem 1rem; background:#0ff; border:none; color:#000; }
     #answer { margin:1rem 0; font-style:italic; }
   </style>
@@ -20,7 +20,7 @@
   <h1>The Reward Collection GPT</h1>
   <form id="chat-form" method="post" action="{{ url_for('ask') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="text" name="message" placeholder="Ask something" required>
+    <textarea name="message" placeholder="Ask something" required></textarea>
     <button type="submit">Send</button>
   </form>
   <div id="answer"></div>
@@ -32,12 +32,12 @@
   <script>
     $('#chat-form').on('submit', function(e){
       e.preventDefault();
-      const text = $('input[name=message]').val();
+      const text = $('textarea[name=message]').val();
       $.post($(this).attr('action'), $(this).serialize(), function(data){
         $('#chat').append('<div class="msg user">user: '+text+'</div>');
         $('#chat').append('<div class="msg assistant">assistant: '+data.answer+'</div>');
         $('#answer').text(data.answer);
-        $('input[name=message]').val('');
+        $('textarea[name=message]').val('');
       });
     });
   </script>
