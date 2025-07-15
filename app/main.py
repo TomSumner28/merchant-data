@@ -91,5 +91,26 @@ def ask() -> Dict[str, str]:
     return {"answer": answer}
 
 
+@app.route("/knowledge")
+def knowledge() -> str:
+    return render_template("knowledge.html")
+
+
+@app.route("/asset")
+def asset() -> str:
+    return render_template("asset.html")
+
+
+@app.route("/email-dashboard")
+def email_dashboard() -> str:
+    timeframe = request.args.get("range", "30d")
+    sample = [
+        {"name": "Alice", "sends": 120, "response_percent": 47, "response_time": "2h"},
+        {"name": "Bob", "sends": 95, "response_percent": 51, "response_time": "3h"},
+        {"name": "Lucy", "sends": 80, "response_percent": 40, "response_time": "1h"},
+    ]
+    return render_template("email_dashboard.html", data=sample, timeframe=timeframe)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

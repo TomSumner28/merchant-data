@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Email Dashboard</h1>
+<form method="get">
+  <label for="range">Range:</label>
+  <select name="range" id="range" onchange="this.form.submit()">
+    <option value="7d" {% if timeframe=='7d' %}selected{% endif %}>Last week</option>
+    <option value="30d" {% if timeframe=='30d' %}selected{% endif %}>Last month</option>
+    <option value="90d" {% if timeframe=='90d' %}selected{% endif %}>Last 90 days</option>
+    <option value="all" {% if timeframe=='all' %}selected{% endif %}>All time</option>
+  </select>
+</form>
+<table border="1" cellpadding="4" cellspacing="0" style="margin-top:1rem;">
+  <tr><th>User</th><th>Sends</th><th>Avg Response %</th><th>Avg Response Time</th></tr>
+  {% for row in data %}
+  <tr><td>{{ row.name }}</td><td>{{ row.sends }}</td><td>{{ row.response_percent }}%</td><td>{{ row.response_time }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

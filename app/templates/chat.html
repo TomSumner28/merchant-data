@@ -1,45 +1,22 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>The Reward Collection GPT</title>
-  <script>
-    // minimal helper for POSTing without external dependencies
-    async function postForm(action, data) {
-      const resp = await fetch(action, {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: new URLSearchParams(data),
-      });
-      return resp.json();
-    }
-  </script>
-  <style>
-    body { background:#111; color:#eee; font-family: Arial, sans-serif; padding:2rem; }
-    h1 { color:#0ff; }
-    #chat { max-width:600px; margin:0 auto 2rem; }
-    .msg { margin-bottom:1rem; }
-    .user { color:#0ff; }
-    .assistant { color:#ff4081; }
-    textarea { width:70%; background:#222; border:1px solid #555; color:#eee; padding:.5rem; height:6rem; }
-    button { padding:.5rem 1rem; background:#0ff; border:none; color:#000; }
-    #answer { margin:1rem 0; font-style:italic; }
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
   <h1>The Reward Collection GPT</h1>
   <form id="chat-form" method="post" action="{{ url_for('ask') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <textarea name="message" placeholder="Ask something" required></textarea>
-    <button type="submit">Send</button>
+    <textarea name="message" placeholder="Ask something" required style="width:70%;background:#222;border:1px solid #555;color:#eee;padding:.5rem;height:6rem;"></textarea>
+    <button type="submit" style="padding:.5rem 1rem;background:#0ff;border:none;color:#000;">Send</button>
   </form>
-  <div id="answer"></div>
-  <div id="chat">
+  <div id="answer" style="margin:1rem 0;font-style:italic;"></div>
+  <div id="chat" style="max-width:600px;margin:0 auto 2rem;">
     {% for m in messages %}
       <div class="msg {{ m.role }}">{{ m.role }}: {{ m.content }}</div>
     {% endfor %}
   </div>
   <script>
+    async function postForm(action, data) {
+      const resp = await fetch(action, {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data)});
+      return resp.json();
+    }
     document.getElementById('chat-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
@@ -53,5 +30,4 @@
       form.message.value = '';
     });
   </script>
-</body>
-</html>
+{% endblock %}
