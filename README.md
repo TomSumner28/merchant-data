@@ -26,6 +26,8 @@ repository root without additional configuration.
 
 
 Then open `http://localhost:5000` in your browser. The application downloads the workbook from Google Sheets and displays the dashboard automatically. Ensure the environment variables mentioned above are set so the sheet can be retrieved.
+The server prints the resolved sheet ID and whether an API key is detected when it
+starts. Check these logs if live data does not appear.
 
 ### Connecting your Google Sheet
 

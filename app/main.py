@@ -45,27 +45,24 @@ def _generate_csrf_token() -> str:
 
 app.jinja_env.globals['csrf_token'] = _generate_csrf_token
 
-# Public Google Sheets document containing the data
-# The sheet ID and API key can be provided via environment variables so
-# private sheets can be accessed.  If not set, a demo sheet is used.
-SHEET_ID = os.getenv("GOOGLE_SHEETS_ID")
-API_KEY = os.getenv("GOOGLE_API_KEY")
-
-if SHEET_ID:
-    if API_KEY:
-        GOOGLE_SHEET_URL = (
-            "https://www.googleapis.com/drive/v3/files/"
-            f"{SHEET_ID}/export?mimeType="
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            f"&key={API_KEY}"
-        )
-    else:
-        GOOGLE_SHEET_URL = (
+def _sheet_url() -> str:
+    """Return the URL to download the configured Google Sheet."""
+    sheet_id = os.getenv("GOOGLE_SHEETS_ID")
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if sheet_id:
+        if api_key:
+            return (
+                "https://www.googleapis.com/drive/v3/files/"
+                f"{sheet_id}/export?mimeType="
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                f"&key={api_key}"
+            )
+        return (
             "https://docs.google.com/spreadsheets/d/"
-            f"{SHEET_ID}/export?format=xlsx"
+            f"{sheet_id}/export?format=xlsx"
         )
-else:
-    GOOGLE_SHEET_URL = (
+    # Fallback to public demo sheet
+    return (
         "https://docs.google.com/spreadsheets/d/"
         "1Np_YQejqfgoW9Se3g6hZnrmmcEu32TrFNF78Z3MxnBA/export?format=xlsx"
     )
@@ -73,13 +70,20 @@ else:
 
 def _fetch_sheet() -> dict:
     """Download the Google Sheet and return parsed workbook data."""
+    url = _sheet_url()
+    print(f"Fetching workbook from {url}")
     tmp = NamedTemporaryFile(delete=False, suffix=".xlsx")
     tmp_path = tmp.name
     try:
-        urlretrieve(GOOGLE_SHEET_URL, tmp_path)
+        urlretrieve(url, tmp_path)
     except Exception as e:
         raise RuntimeError(f"Download failed: {e}")
-    return read_workbook(tmp_path)
+    data = read_workbook(tmp_path)
+    try:
+        os.unlink(tmp_path)
+    except OSError:
+        pass
+    return data
 
 @app.route('/')
 def index():
@@ -273,4 +277,6 @@ def _to_float(value):
 
 
 if __name__ == '__main__':
+    print(f"GOOGLE_SHEETS_ID={os.getenv('GOOGLE_SHEETS_ID')}")
+    print(f"GOOGLE_API_KEY={'set' if os.getenv('GOOGLE_API_KEY') else 'not set'}")
     app.run(debug=True)
