@@ -23,6 +23,8 @@ python3 app/main.py
 
 Open `http://localhost:5000` in your browser to start chatting.  The conversation history is stored in your session so you can ask follow‑up questions.
 
+The app will automatically retry if the OpenAI API returns a rate limit error. If you keep seeing "Too Many Requests" make sure your API key has sufficient quota.
+
 ### Deployment
 
 The included `vercel.json` file allows the Flask app to run on Vercel.  Configure the environment variables above in your Vercel project and deploy as normal.  All requests are forwarded to `api/index.py` which exposes the Flask application.

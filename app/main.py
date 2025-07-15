@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import os
 from typing import Dict, List
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+from time import sleep
 
 from flask import Flask, render_template, request, session
 
@@ -41,14 +43,24 @@ def _chat_with_gpt(messages: List[Dict[str, str]]) -> str:
             "Authorization": f"Bearer {api_key}",
         },
     )
-    try:  # pragma: no cover - network calls
-        with urlopen(req) as resp:
-            data = json.load(resp)
-            return (
-                data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-            )
-    except Exception as e:  # pragma: no cover - network errors
-        return f"Request failed: {e}"
+    for _ in range(3):  # pragma: no cover - network calls
+        try:
+            with urlopen(req) as resp:
+                data = json.load(resp)
+                return (
+                    data.get("choices", [{}])[0]
+                    .get("message", {})
+                    .get("content", "")
+                    .strip()
+                )
+        except HTTPError as e:
+            if e.code == 429:
+                sleep(1)
+                continue
+            return f"Request failed: {e}"
+        except Exception as e:  # pragma: no cover - network errors
+            return f"Request failed: {e}"
+    return "Request failed: rate limit exceeded"
 
 
 # ----------------------------------------------------------------------------
