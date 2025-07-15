@@ -1,38 +1,10 @@
-from flask import (
-    Flask,
-    request,
-    redirect,
-    url_for,
-    render_template,
-    flash,
-    session,
-    abort,
-)
-from urllib.request import urlretrieve, Request, urlopen
-from tempfile import NamedTemporaryFile
-import json
+from flask import Flask, request, render_template, session, redirect, url_for
 import os
-import sys
-
-# Ensure the module can be imported when running from the repo root
-sys.path.insert(0, os.path.dirname(__file__))
-
-from simple_xlsx import read_workbook
+import json
+from urllib.request import Request, urlopen
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'change_me')
-
-# Store uploaded data keyed by session id
-user_data = {}
-
-
-def _get_session_id() -> str:
-    """Return a unique session id and ensure it exists."""
-    sid = session.get('sid')
-    if not sid:
-        sid = os.urandom(16).hex()
-        session['sid'] = sid
-    return sid
 
 
 def _generate_csrf_token() -> str:
@@ -42,93 +14,13 @@ def _generate_csrf_token() -> str:
         session['_csrf_token'] = token
     return token
 
-
 app.jinja_env.globals['csrf_token'] = _generate_csrf_token
 
 
-@app.route('/favicon.ico')
-@app.route('/favicon.png')
-def favicon():
-    """Return an empty 204 response for missing favicons."""
-    return ('', 204)
-
-def _sheet_url() -> str:
-    """Return the URL to download the configured Google Sheet."""
-    full_url = os.getenv("GOOGLE_SHEET_URL")
-    if full_url:
-        # Convert a regular Google Sheets link into an export URL if needed
-        if "/edit" in full_url and "export?" not in full_url:
-            try:
-                sheet_id = full_url.split("/d/")[1].split("/")[0]
-                full_url = (
-                    f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
-                )
-            except Exception:
-                pass
-        return full_url
-
-    sheet_id = os.getenv("GOOGLE_SHEETS_ID")
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if sheet_id:
-        if api_key:
-            return (
-                "https://www.googleapis.com/drive/v3/files/"
-                f"{sheet_id}/export?mimeType="
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                f"&key={api_key}"
-            )
-        return (
-            "https://docs.google.com/spreadsheets/d/"
-            f"{sheet_id}/export?format=xlsx"
-        )
-    # Fallback to public demo sheet
-    return (
-        "https://docs.google.com/spreadsheets/d/"
-        "1Np_YQejqfgoW9Se3g6hZnrmmcEu32TrFNF78Z3MxnBA/export?format=xlsx"
-    )
-
-
-def _fetch_sheet() -> dict:
-    """Download the Google Sheet and return parsed workbook data."""
-    url = _sheet_url()
-    print(f"Fetching workbook from {url}")
-    tmp = NamedTemporaryFile(delete=False, suffix=".xlsx")
-    tmp_path = tmp.name
-    try:
-        urlretrieve(url, tmp_path)
-    except Exception as e:
-        raise RuntimeError(f"Download failed: {e}")
-    data = read_workbook(tmp_path)
-    try:
-        os.unlink(tmp_path)
-    except OSError:
-        pass
-    return data
-
-
-def _get_sheet(data: dict, name: str):
-    """Return sheet rows matching the given name, ignoring case and spaces."""
-    if not data:
-        return []
-    norm = name.lower().replace(" ", "")
-    for key, rows in data.items():
-        key_norm = key.lower().replace(" ", "")
-        if key_norm == norm or norm in key_norm:
-            return rows
-    return []
-
-
-def _chat_with_gpt(question: str, context: str = "") -> str:
-    """Send the question to OpenAI and return the response."""
-    api_key = os.getenv("OPENAI_API_KEY")
+def _chat_with_gpt(messages):
+    api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
         return "OpenAI API key not configured."
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-    ]
-    if context:
-        messages.append({"role": "system", "content": context})
-    messages.append({"role": "user", "content": question})
     payload = json.dumps({"model": "gpt-3.5-turbo", "messages": messages}).encode("utf-8")
     req = Request(
         "https://api.openai.com/v1/chat/completions",
@@ -143,205 +35,30 @@ def _chat_with_gpt(question: str, context: str = "") -> str:
             data = json.loads(resp.read())
             return data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
     except Exception as e:
-        return f"OpenAI request failed: {e}"
+        return f"Request failed: {e}"
 
-@app.route('/')
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    """Load data if needed and show the dashboard."""
-    sid = _get_session_id()
-    if sid not in user_data:
-        try:
-            user_data[sid] = _fetch_sheet()
-            flash('Data loaded from Google Sheets.')
-        except Exception as e:
-            flash(f'Failed to load Google Sheet: {e}')
-            print(f"Exception when fetching sheet: {e}")
-            user_data[sid] = {}
-    return redirect(url_for('dashboard'))
-
-
-@app.route('/load')
-def load():
-    """Fetch the Google Sheet and redirect to dashboard."""
-    sid = _get_session_id()
-    try:
-        user_data[sid] = _fetch_sheet()
-        flash('Data loaded from Google Sheets.')
-    except Exception as e:
-        flash(f'Failed to load Google Sheet: {e}')
-        print(f"Exception when fetching sheet: {e}")
-        user_data[sid] = {}
-    return redirect(url_for('dashboard'))
-
-@app.route('/upload', methods=['POST'])
-def upload():
-    sid = _get_session_id()
-    if session.pop('_csrf_token', None) != request.form.get('csrf_token'):
-        abort(400)
-    file = request.files.get('file')
-    if not file or file.filename == '':
-        flash('No file selected')
+    session.setdefault('messages', [])
+    if request.method == 'POST':
+        if session.pop('_csrf_token', None) != request.form.get('csrf_token'):
+            return redirect(url_for('index'))
+        user_msg = request.form.get('message', '').strip()
+        if user_msg:
+            session['messages'].append({'role': 'user', 'content': user_msg})
+            answer = _chat_with_gpt(session['messages'])
+            session['messages'].append({'role': 'assistant', 'content': answer})
         return redirect(url_for('index'))
-    with NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp:
-        file.save(tmp.name)
-        path = tmp.name
-    try:
-        user_data[sid] = read_workbook(path)
-    except Exception as e:
-        flash(f'Failed to parse file: {e}')
-        user_data[sid] = {}
-    return redirect(url_for('dashboard'))
+    return render_template('index.html', messages=session['messages'])
 
 
-def _compute_stats(rows):
-    stats = {
-        'total': len(rows),
-        'deal_stage_counts': {},
-        'region_counts': {},
-        'sales_rep_counts': {},
-        'lost_count': 0,
-        'live_count': 0,
-        'lost_per_region': {},
-        'live_per_region': {},
-        'avg_cashback_live': 0.0,
-        'avg_cashback_per_region': {},
-        'sales_rep_live_counts': {},
-    }
-    cashback_total = 0.0
-    cashback_count = 0
-    for row in rows:
-        stage = row.get('deal_stage', 'Unknown')
-        region = row.get('region', 'Unknown')
-        rep = row.get('sales_rep', 'Unknown')
-        stats['deal_stage_counts'][stage] = stats['deal_stage_counts'].get(stage, 0) + 1
-        stats['region_counts'][region] = stats['region_counts'].get(region, 0) + 1
-        stats['sales_rep_counts'][rep] = stats['sales_rep_counts'].get(rep, 0) + 1
-        if stage.lower() in {'lost', 'churn', 'churned'}:
-            stats['lost_count'] += 1
-            stats['lost_per_region'][region] = stats['lost_per_region'].get(region, 0) + 1
-        if stage.lower() == 'live':
-            rep = row.get('sales_rep', 'Unknown')
-            stats['sales_rep_live_counts'][rep] = stats['sales_rep_live_counts'].get(rep, 0) + 1
-            stats['live_count'] += 1
-            stats['live_per_region'][region] = stats['live_per_region'].get(region, 0) + 1
-            cb = _to_float(row.get('cashback', row.get('cashback_amount')))
-            if cb is not None:
-                cashback_total += cb
-                cashback_count += 1
-                region_entry = stats['avg_cashback_per_region'].setdefault(region, {'sum': 0.0, 'count': 0})
-                region_entry['sum'] += cb
-                region_entry['count'] += 1
-    stats['lost_rate'] = (stats['lost_count'] / stats['total']) * 100 if stats['total'] else 0
-    if cashback_count:
-        stats['avg_cashback_live'] = cashback_total / cashback_count
-    for region, val in stats['avg_cashback_per_region'].items():
-        if val['count']:
-            stats['avg_cashback_per_region'][region] = val['sum'] / val['count']
-        else:
-            stats['avg_cashback_per_region'][region] = 0.0
-    return stats
-
-
-@app.route('/dashboard')
-def dashboard():
-    sid = _get_session_id()
-    data = user_data.get(sid)
-    if not data:
-        try:
-            user_data[sid] = _fetch_sheet()
-            flash('Data loaded from Google Sheets.')
-            data = user_data[sid]
-        except Exception as e:
-            flash(f'Failed to load Google Sheet: {e}')
-            data = {}
-    merchant_data = _get_sheet(data, 'merchant list')
-    offs_data = _get_sheet(data, 'offs list')
-    stats = _compute_stats(merchant_data)
-    return render_template(
-        'dashboard.html',
-        merchant_data=merchant_data,
-        offs_data=offs_data,
-        stats=stats,
-        stats_json=json.dumps(stats),
-    )
-
-
-@app.route('/ask', methods=['POST'])
-def ask():
-    sid = _get_session_id()
-    data = user_data.get(sid, {})
-    merchant_data = _get_sheet(data, 'merchant list')
-    stats = _compute_stats(merchant_data) if merchant_data else {}
-    question = request.form.get('question', '')
-    answer = _answer_question(merchant_data, question, stats)
-    return {'answer': answer}
-
-
-def _answer_question(rows, question: str, stats: dict) -> str:
-    if not rows:
-        return 'No data loaded.'
-    q = question.lower()
-    if 'live' in q:
-        region = _extract_region(rows, q)
-        rep = _extract_sales_rep(rows, q)
-        count = sum(
-            1
-            for r in rows
-            if r.get('deal_stage', '').lower() == 'live'
-            and (not region or r.get('region', '').lower() == region.lower())
-            and (not rep or r.get('sales_rep', '').lower() == rep.lower())
-        )
-        qualifiers = []
-        if rep:
-            qualifiers.append(rep.title())
-        if region:
-            qualifiers.append(region)
-        qualifier = ' in '.join(qualifiers) if qualifiers else ''
-        return f'{count} retailers are live{(" in " + qualifier) if qualifier else ""}.'
-    if 'lost' in q and '2024' in q:
-        count = sum(1 for r in rows if r.get('deal_stage', '').lower() == 'lost' and '2024' in str(r.get('lost_date', '')))
-        return f'{count} retailers lost in 2024.'
-    if 'average cashback' in q:
-        region = _extract_region(rows, q)
-        values = [
-            _to_float(r.get('cashback', r.get('cashback_amount')))
-            for r in rows
-            if r.get('deal_stage', '').lower() == 'live'
-            and (not region or r.get('region', '').lower() == region.lower())
-        ]
-        values = [v for v in values if v is not None]
-        if not values:
-            return 'No cashback data available.'
-        avg = sum(values) / len(values)
-        return f'Average cashback{f" in {region}" if region else ""} is {avg:.2f}.'
-    context = f"Current stats: {json.dumps(stats)}"
-    return _chat_with_gpt(question, context)
-
-
-def _extract_region(rows, text: str):
-    regions = {r.get('region', '') for r in rows if r.get('region')}
-    for region in regions:
-        if region.lower() in text:
-            return region
-    return None
-
-
-def _extract_sales_rep(rows, text: str):
-    reps = {r.get('sales_rep', '') for r in rows if r.get('sales_rep')}
-    for rep in reps:
-        if rep.lower() in text:
-            return rep
-    return None
-
-
-def _to_float(value):
-    try:
-        return float(str(value).replace('%', '').strip())
-    except (TypeError, ValueError):
-        return None
+@app.route('/reset', methods=['POST'])
+def reset():
+    session.pop('messages', None)
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
-    print(f"GOOGLE_SHEETS_ID={os.getenv('GOOGLE_SHEETS_ID')}")
-    print(f"GOOGLE_API_KEY={'set' if os.getenv('GOOGLE_API_KEY') else 'not set'}")
     app.run(debug=True)
+

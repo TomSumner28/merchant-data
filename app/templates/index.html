@@ -1,42 +1,59 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Merchant Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #121212;
-            color: #eee;
-            margin: 40px;
-        }
-        h1, h2 {
-            color: #0ff;
-        }
-        input, button {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            color: #eee;
-            padding: 5px 10px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>The Reward Collection GPT</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    h1 { color: #ff4081; }
+    .chat-box {
+      border: 1px solid #444;
+      padding: 1rem;
+      max-width: 700px;
+      margin: auto;
+      background: #222;
+      border-radius: 8px;
+    }
+    .message { margin: .5rem 0; }
+    .user { color: #8bc34a; }
+    .assistant { color: #03a9f4; }
+    form { margin-top: 1rem; text-align: center; }
+    input[type=text] {
+      width: 80%;
+      padding: .5rem;
+      background: #333;
+      border: 1px solid #555;
+      color: #eee;
+    }
+    button {
+      padding: .5rem 1rem;
+      margin-left: .5rem;
+      background: #ff4081;
+      color: #fff;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Merchant Dashboard</h1>
-    <p><a href="{{ url_for('load') }}">Load data from Google Sheets</a></p>
-    <h2>Or upload Excel file</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="file" name="file" accept=".xlsx">
-        <input type="submit" value="Upload">
-    </form>
+<h1>The Reward Collection GPT</h1>
+<div class="chat-box">
+  {% for m in messages %}
+    <div class="message {{ m.role }}">{{ m.content }}</div>
+  {% endfor %}
+</div>
+<form action="/" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="text" name="message" placeholder="Type your message" autofocus>
+  <button type="submit">Send</button>
+</form>
+<form action="/reset" method="post" style="text-align:center; margin-top:.5rem;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit">Reset</button>
+</form>
 </body>
 </html>
