@@ -27,6 +27,7 @@ Open `http://localhost:5000` in your browser to start chatting. A multi‑line t
 - **Knowledge Base** – placeholder for documentation
 - **Asset Creation** – placeholder for creative tools
 - **Email Dashboard** – example stats for team email activity
+- **External Tools** – shortcuts to finance, admin and sales platforms
 
 Use the toggle button in the header to switch between light and dark modes.
 

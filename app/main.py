@@ -101,6 +101,11 @@ def asset() -> str:
     return render_template("asset.html")
 
 
+@app.route("/tools")
+def tools() -> str:
+    return render_template("tools.html")
+
+
 @app.route("/email-dashboard")
 def email_dashboard() -> str:
     timeframe = request.args.get("range", "30d")
