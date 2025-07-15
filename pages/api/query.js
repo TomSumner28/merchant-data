@@ -1,10 +1,27 @@
+import axios from 'axios';
+
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
   const { query } = req.body;
 
-  // Placeholder AI response logic
-  if (query.toLowerCase().includes("us retailers")) {
-    res.status(200).json({ result: "There are currently 42 live retailers in the US." });
-  } else {
-    res.status(200).json({ result: "I'll need to check that data – coming soon!" });
+  try {
+    const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: query }]
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      }
+    });
+
+    const result = openaiRes.data.choices[0].message.content.trim();
+    res.status(200).json({ result });
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    res.status(500).json({ result: 'Failed to fetch response from OpenAI.' });
   }
 }
