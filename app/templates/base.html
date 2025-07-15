@@ -22,7 +22,7 @@
 </head>
 <body>
   <header>
-    <nav>
+    <nav class="links">
       <a href="{{ url_for('index') }}">Home</a>
       <a href="https://forecasting.therewardcollection.com" target="_blank">Forecasting</a>
       <a href="{{ url_for('knowledge') }}">Knowledge Base</a>
@@ -30,7 +30,7 @@
       <a href="{{ url_for('email_dashboard') }}">Email Dashboard</a>
       <a href="{{ url_for('tools') }}">External Tools</a>
     </nav>
-    <button class="mode" onclick="toggleMode()">Toggle Mode</button>
+    <button class="mode" onclick="toggleMode()" aria-label="Toggle dark or light mode">Toggle Mode</button>
   </header>
   <main>
     {% block content %}{% endblock %}
