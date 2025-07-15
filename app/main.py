@@ -47,6 +47,19 @@ app.jinja_env.globals['csrf_token'] = _generate_csrf_token
 
 def _sheet_url() -> str:
     """Return the URL to download the configured Google Sheet."""
+    full_url = os.getenv("GOOGLE_SHEET_URL")
+    if full_url:
+        # Convert a regular Google Sheets link into an export URL if needed
+        if "/edit" in full_url and "export?" not in full_url:
+            try:
+                sheet_id = full_url.split("/d/")[1].split("/")[0]
+                full_url = (
+                    f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
+                )
+            except Exception:
+                pass
+        return full_url
+
     sheet_id = os.getenv("GOOGLE_SHEETS_ID")
     api_key = os.getenv("GOOGLE_API_KEY")
     if sheet_id:
@@ -123,16 +136,8 @@ def _chat_with_gpt(question: str, context: str = "") -> str:
 
 @app.route('/')
 def index():
-    """Load data from Google Sheets and show the dashboard."""
-    sid = _get_session_id()
-    try:
-        user_data[sid] = _fetch_sheet()
-        flash("Data loaded from Google Sheets.")
-    except Exception as e:
-        flash(f"Failed to load Google Sheet: {e}")
-        print(f"Exception when fetching sheet: {e}")
-        user_data[sid] = {}
-    return redirect(url_for("dashboard"))
+    """Render the home page with an option to load data."""
+    return render_template('index.html')
 
 
 @app.route('/load')

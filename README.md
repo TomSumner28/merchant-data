@@ -11,8 +11,7 @@ dependency with:
 pip install -r requirements.txt
 ```
 
-Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private. When both are provided the app downloads the file using the Google Drive API.
-If these variables are not set the dashboard uses the public TRC Master List for demonstration purposes.
+Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private. Alternatively you can provide the full link via `GOOGLE_SHEET_URL`. When a link ending in `/edit` is supplied the app automatically converts it into the correct export URL. If none of these variables are set the dashboard uses the public TRC Master List for demonstration purposes.
 
 To enable AI answers for general questions, set `OPENAI_API_KEY` with an OpenAI API token. Without this the Ask bar only responds to built-in data queries.
 
@@ -27,18 +26,19 @@ The script automatically adjusts the Python path so it can be executed from the
 repository root without additional configuration.
 
 
-Then open `http://localhost:5000` in your browser. The application downloads the workbook from Google Sheets and displays the dashboard automatically. Ensure the environment variables mentioned above are set so the sheet can be retrieved.
-The server prints the resolved sheet ID and whether an API key is detected when it
-starts. Check these logs if live data does not appear.
+Then open `http://localhost:5000` in your browser and click **"Load data from Google Sheets"**. The server prints the resolved sheet ID and whether an API key is detected when it starts. Check these logs if live data does not appear.
 
 ### Connecting your Google Sheet
 
-1. Open your workbook in the browser and copy the long ID from the URL.
-2. Export this value in your shell before running the app:
+1. Open your workbook in the browser and copy the long ID from the URL (or save the full share link).
+2. Export the ID or link in your shell before running the app:
 
    ```bash
+   # Either provide the ID and optional API key
    export GOOGLE_SHEETS_ID="<YOUR_SHEET_ID>"
    export GOOGLE_API_KEY="<YOUR_API_KEY>"   # optional if the sheet is public
+   # or pass the full share link
+   # export GOOGLE_SHEET_URL="https://docs.google.com/..."
    export FLASK_SECRET_KEY="$(openssl rand -hex 16)"
    export OPENAI_API_KEY="<YOUR_OPENAI_KEY>"  # optional for GPT answers
    python3 app/main.py
