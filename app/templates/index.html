@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Upload Merchant Excel</h1>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+    {% for msg in messages %}
+      <li>{{ msg }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="file" name="file" accept=".xlsx" required>
+  <button type="submit" class="btn">Upload</button>
+</form>
+{% if has_data %}
+<p><a href="{{ url_for('dashboard') }}">View Dashboard</a></p>
+{% endif %}
+{% endblock %}

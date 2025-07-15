@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Merchant Dashboard</h1>
+<form id="ask-form" method="post" action="{{ url_for('ask') }}" class="chat">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <textarea name="message" rows="2" placeholder="Ask a question"></textarea>
+  <button type="submit" class="btn">Ask</button>
+</form>
+<div id="answer" style="margin:1rem 0;font-style:italic;"></div>
+<canvas id="stageChart" height="120"></canvas>
+<canvas id="regionChart" height="120"></canvas>
+<canvas id="repChart" height="120"></canvas>
+<p>Average cashback across live brands: {{ stats.avg_cashback }}%</p>
+<p>Lost merchants: {{ stats.lost }}</p>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-H+K7U5CnX" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const stageData = {{ stats.stage_counts | tojson }};
+const regionData = {{ stats.region_counts | tojson }};
+const repData = {{ stats.rep_live | tojson }};
+const ctx1 = document.getElementById('stageChart').getContext('2d');
+new Chart(ctx1, {type:'bar', data:{labels:Object.keys(stageData), datasets:[{label:'Deal Stages', data:Object.values(stageData), backgroundColor:'#60a5fa'}]}});
+const ctx2 = document.getElementById('regionChart').getContext('2d');
+new Chart(ctx2, {type:'pie', data:{labels:Object.keys(regionData), datasets:[{data:Object.values(regionData), backgroundColor:'#a78bfa'}]}});
+const ctx3 = document.getElementById('repChart').getContext('2d');
+new Chart(ctx3, {type:'bar', data:{labels:Object.keys(repData), datasets:[{label:'Live per Rep', data:Object.values(repData), backgroundColor:'#34d399'}]}});
+$(document).on('submit','#ask-form',async e=>{e.preventDefault();const form=e.target;const resp=await $.post(form.action,$(form).serialize());$('#answer').text(resp.answer);});
+</script>
+{% endblock %}

@@ -1,38 +1,32 @@
-# The Reward Collection GPT
+# The Reward Collection GPT Dashboard
 
-This repository contains a tiny Flask application that wraps the OpenAI ChatGPT API in a TRC branded interface. It lets your team chat with GPT right from a simple web page. The layout now mirrors the design used on [forecasting.therewardcollection.com](https://forecasting.therewardcollection.com) with a gradient banner and Poppins typography.
+This Flask app lets your team upload the TRC master Excel workbook and explore key metrics in a TRC‑branded interface. It also includes a simple AI bar for natural‑language questions with a fallback to OpenAI if a query cannot be answered directly.
 
 ## Setup
 
-Install Flask using the provided requirements file:
+Install Flask with the requirements file:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Set the following environment variables before starting the app:
+Set the following environment variables before running:
 
-- `OPENAI_API_KEY` – your OpenAI API key
+- `OPENAI_API_KEY` – optional, enables GPT fallback
 - `FLASK_SECRET_KEY` – secret used for session cookies
 
-Then run:
+Start the server with:
 
 ```bash
 python3 app/main.py
 ```
 
-Open `http://localhost:5000` in your browser to start chatting. A multi‑line textarea lets you draft longer questions and answers appear directly below the form so the conversation stays on a single page. The navigation bar links to additional pages:
+Open `http://localhost:5000` to upload your workbook. Once uploaded you can view the dashboard and ask questions such as *"How many live merchants does Lucy have?"* or *"What is the average cashback?"*.
 
-- **Forecasting** – external site with forecasting tools
-- **Knowledge Base** – placeholder for documentation
-- **Asset Creation** – placeholder for creative tools
-- **Email Dashboard** – example stats for team email activity
-- **External Tools** – shortcuts to finance, admin and sales platforms
+## Files
 
-Use the toggle button in the header to switch between light and dark modes.
-
-The app will automatically retry if the OpenAI API returns a rate limit error. If you keep seeing "Too Many Requests" make sure your API key has sufficient quota.
-
-### Deployment
-
-The included `vercel.json` file allows the Flask app to run on Vercel.  Configure the environment variables above in your Vercel project and deploy as normal.  All requests are forwarded to `api/index.py` which exposes the Flask application.
+- `app/main.py` – Flask routes and helpers
+- `app/simple_xlsx.py` – tiny Excel parser using the Python standard library
+- `app/templates/` – Jinja2 templates for the interface
+- `static/style.css` – shared styles with light/dark modes
+- `vercel.json` – configuration for deploying to Vercel
