@@ -1,4 +1,7 @@
 {
-  "builds": [{"src": "app/main.py", "use": "@vercel/python"}],
-  "routes": [{"src": "/(.*)", "dest": "app/main.py"}]
+  "cleanUrls": true,
+  "rewrites": [
+    {"source": "/dashboard", "destination": "/dashboard.html"},
+    {"source": "/", "destination": "/index.html"}
+  ]
 }

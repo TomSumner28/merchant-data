@@ -68,11 +68,9 @@ the back-end logic. These HTML files can also be deployed as a static site.
 Deploying `index.html` and `dashboard.html` to a service such as Vercel will
 give you a read-only preview of the interface without any back‑end.
 
-The repository includes a `vercel.json` file that runs `app/main.py` with the
-Vercel Python runtime. Set the environment variables mentioned above in the
-Vercel project so the sheet is fetched during deployment. If you prefer a static
-preview only, replace this file with a configuration that serves the HTML
-directly.
+The repository includes a `vercel.json` file that rewrites `/` to `index.html`
+and `/dashboard` to `dashboard.html` so the static pages can be hosted on
+Vercel. Remove or change this file if you wish to run the Flask server instead.
 
 The built-in Excel reader normalizes column headers by converting them to
 lowercase and replacing spaces with underscores. Ensure your sheet includes
