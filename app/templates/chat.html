@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>The Reward Collection GPT</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJ7MGDz3I1kuui9rK/3HB+7ENqQkDoDib0yV0=" crossorigin="anonymous"></script>
+  <style>
+    body { background:#111; color:#eee; font-family: Arial, sans-serif; padding:2rem; }
+    h1 { color:#0ff; }
+    #chat { max-width:600px; margin:0 auto 2rem; }
+    .msg { margin-bottom:1rem; }
+    .user { color:#0ff; }
+    .assistant { color:#ff4081; }
+    input[type=text] { width:70%; background:#222; border:1px solid #555; color:#eee; padding:.5rem; }
+    button { padding:.5rem 1rem; background:#0ff; border:none; color:#000; }
+  </style>
+</head>
+<body>
+  <h1>The Reward Collection GPT</h1>
+  <div id="chat">
+    {% for m in messages %}
+      <div class="msg {{ m.role }}">{{ m.role }}: {{ m.content }}</div>
+    {% endfor %}
+  </div>
+  <form id="chat-form" method="post" action="{{ url_for('ask') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="text" name="message" placeholder="Ask something" required>
+    <button type="submit">Send</button>
+  </form>
+  <script>
+    $('#chat-form').on('submit', function(e){
+      e.preventDefault();
+      const text = $('input[name=message]').val();
+      $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#chat').append('<div class="msg user">user: '+text+'</div>');
+        $('#chat').append('<div class="msg assistant">assistant: '+data.answer+'</div>');
+        $('input[name=message]').val('');
+      });
+    });
+  </script>
+</body>
+</html>
