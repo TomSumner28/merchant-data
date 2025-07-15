@@ -85,6 +85,14 @@ def _fetch_sheet() -> dict:
         pass
     return data
 
+
+def _get_sheet(data: dict, name: str):
+    """Return sheet rows for the given name, ignoring case."""
+    for key, rows in data.items():
+        if key.lower() == name.lower():
+            return rows
+    return []
+
 @app.route('/')
 def index():
     """Load data from Google Sheets and show the dashboard."""
@@ -191,8 +199,8 @@ def dashboard():
         except Exception as e:
             flash(f'Failed to load Google Sheet: {e}')
             data = {}
-    merchant_data = data.get('merchant list', [])
-    offs_data = data.get('offs list', [])
+    merchant_data = _get_sheet(data, 'merchant list')
+    offs_data = _get_sheet(data, 'offs list')
     stats = _compute_stats(merchant_data)
     return render_template(
         'dashboard.html',
@@ -207,7 +215,7 @@ def dashboard():
 def ask():
     sid = _get_session_id()
     data = user_data.get(sid, {})
-    merchant_data = data.get('merchant list', [])
+    merchant_data = _get_sheet(data, 'merchant list')
     question = request.form.get('question', '')
     answer = _answer_question(merchant_data, question)
     return {'answer': answer}

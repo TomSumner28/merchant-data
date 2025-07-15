@@ -1,6 +1,6 @@
 # merchant-data
 
-This repository contains a simple Flask dashboard for viewing merchant data. The application automatically downloads the merchant workbook from Google Sheets on start. The workbook should contain two sheets named **"merchant list"** and **"offs list"**. Statistics are calculated from the merchant list sheet.
+This repository contains a simple Flask dashboard for viewing merchant data. The application automatically downloads the merchant workbook from Google Sheets on start. The workbook should contain two sheets typically named **"Merchant List"** and **"Offs List"** (matching is case-insensitive). Statistics are calculated from the merchant list sheet.
 
 ## Requirements
 
@@ -65,11 +65,11 @@ the back-end logic. These HTML files can also be deployed as a static site.
 Deploying `index.html` and `dashboard.html` to a service such as Vercel will
 give you a read-only preview of the interface without any back‑end.
 
-For a simple design preview the repository includes a `vercel.json` file that
-serves the static HTML only. If you want the full Flask back‑end in Vercel,
-replace that configuration with one that builds `app/main.py` using the Vercel
-Python runtime and sets the environment variables above so the Google Sheet is
-loaded.
+The repository includes a `vercel.json` file that runs `app/main.py` with the
+Vercel Python runtime. Set the environment variables mentioned above in the
+Vercel project so the sheet is fetched during deployment. If you prefer a static
+preview only, replace this file with a configuration that serves the HTML
+directly.
 
 ## Limitations
 
