@@ -1,41 +1,37 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>Dashboard</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-H+K7U5CnX" crossorigin="anonymous"></script>
-</head>
-<body>
-    <h1>Merchant Dashboard</h1>
-    <div>
-        <form id="ask-form" method="post" action="{{ url_for('ask') }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="text" name="question" id="question" placeholder="Ask a question">
-            <button type="submit">Ask</button>
-        </form>
-        <p id="answer"></p>
-    </div>
-    <h2>Stats</h2>
-    <p>Total merchants: {{ stats.total }}</p>
-    <p>Lost rate: {{ '%.2f' % stats.lost_rate }}%</p>
-    <h3>Deal Stage Counts</h3>
-    <ul>
-        {% for stage, count in stats.deal_stage_counts.items() %}
-            <li>{{ stage }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
-    <h3>Region Counts</h3>
-    <ul>
-        {% for region, count in stats.region_counts.items() %}
-            <li>{{ region }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
-    <script>
-        $('#ask-form').on('submit', function(e){
-            e.preventDefault();
-            $.post($(this).attr('action'), $(this).serialize(), function(data){
-                $('#answer').text(data.answer);
-            });
-        });
-    </script>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Merchant Dashboard</h1>
+<div>
+    <form id="ask-form" method="post" action="{{ url_for('ask') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="question" id="question" placeholder="Ask a question">
+        <button type="submit">Ask</button>
+    </form>
+    <p id="answer"></p>
+</div>
+<h2>Stats</h2>
+<p>Total merchants: {{ stats.total }}</p>
+<p>Lost rate: {{ '%.2f' % stats.lost_rate }}%</p>
+<h3>Deal Stage Counts</h3>
+<ul>
+    {% for stage, count in stats.deal_stage_counts.items() %}
+        <li>{{ stage }}: {{ count }}</li>
+    {% endfor %}
+</ul>
+<h3>Region Counts</h3>
+<ul>
+    {% for region, count in stats.region_counts.items() %}
+        <li>{{ region }}: {{ count }}</li>
+    {% endfor %}
+</ul>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-H+K7U5CnX" crossorigin="anonymous"></script>
+<script>
+$('#ask-form').on('submit', function(e){
+    e.preventDefault();
+    $.post($(this).attr('action'), $(this).serialize(), function(data){
+        $('#answer').text(data.answer);
+    });
+});
+</script>
+{% endblock %}

@@ -1,23 +1,25 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>Merchant Dashboard</title>
-</head>
-<body>
-    <h1>Upload Merchant Excel</h1>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="file" name="file" accept=".xlsx">
-        <input type="submit" value="Upload">
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}TRC Chat{% endblock %}
+{% block content %}
+<h1>TRC GPT</h1>
+<form id="chat-form" method="post" action="{{ url_for('ask') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <textarea name="question" id="question" placeholder="Ask a question..."></textarea>
+    <button type="submit">Send</button>
+</form>
+<div id="responses"></div>
+<script>
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    const resp = await fetch(form.action, {method:'POST', body: data});
+    const json = await resp.json();
+    const div = document.createElement('div');
+    div.className = 'chat-response';
+    div.textContent = json.answer;
+    document.getElementById('responses').prepend(div);
+    form.question.value = '';
+});
+</script>
+{% endblock %}

@@ -1,6 +1,16 @@
 import os
+import json
 import tempfile
-from flask import Flask, request, redirect, url_for, render_template, flash, session
+from urllib import request as urlrequest
+from flask import (
+    Flask,
+    request,
+    redirect,
+    url_for,
+    render_template,
+    flash,
+    session,
+)
 from simple_xlsx import read_workbook
 
 app = Flask(__name__)
@@ -21,6 +31,26 @@ app.jinja_env.globals['csrf_token'] = _generate_csrf_token
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/knowledge')
+def knowledge():
+    return render_template('knowledge.html')
+
+
+@app.route('/asset')
+def asset():
+    return render_template('asset.html')
+
+
+@app.route('/email')
+def email():
+    return render_template('email.html')
+
+
+@app.route('/tools')
+def tools():
+    return render_template('tools.html')
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -81,16 +111,26 @@ def ask():
 
 def _answer_question(rows, question: str) -> str:
     if not rows:
-        return 'No data loaded.'
+        return _chat_with_gpt(question)
     q = question.lower()
     if 'live' in q:
         region = _extract_region(rows, q)
-        count = sum(1 for r in rows if r.get('deal_stage', '').lower() == 'live' and (not region or r.get('region', '').lower() == region.lower()))
-        return f'{count} retailers are live{f" in {region}" if region else ""}.'
+        count = sum(
+            1
+            for r in rows
+            if r.get('deal_stage', '').lower() == 'live'
+            and (not region or r.get('region', '').lower() == region.lower())
+        )
+        return f"{count} retailers are live{f' in {region}' if region else ''}."
     if 'lost' in q and '2024' in q:
-        count = sum(1 for r in rows if r.get('deal_stage', '').lower() == 'lost' and '2024' in str(r.get('lost_date', '')))
-        return f'{count} retailers lost in 2024.'
-    return 'Question not recognized.'
+        count = sum(
+            1
+            for r in rows
+            if r.get('deal_stage', '').lower() == 'lost'
+            and '2024' in str(r.get('lost_date', ''))
+        )
+        return f"{count} retailers lost in 2024."
+    return _chat_with_gpt(question)
 
 
 def _extract_region(rows, text: str):
@@ -99,6 +139,33 @@ def _extract_region(rows, text: str):
         if region.lower() in text:
             return region
     return None
+
+
+def _chat_with_gpt(question: str) -> str:
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not api_key:
+        return 'No data loaded.'
+    payload = {
+        'model': 'gpt-3.5-turbo',
+        'messages': [
+            {'role': 'user', 'content': question},
+        ],
+        'temperature': 0.2,
+    }
+    req = urlrequest.Request(
+        'https://api.openai.com/v1/chat/completions',
+        data=json.dumps(payload).encode(),
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {api_key}',
+        },
+    )
+    try:
+        with urlrequest.urlopen(req) as resp:
+            data = json.loads(resp.read())
+            return data['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        return f'Request failed: {e}'
 
 
 if __name__ == '__main__':

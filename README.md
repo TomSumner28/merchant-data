@@ -5,7 +5,7 @@ This repository contains a simple Flask dashboard for viewing merchant data from
 ## Requirements
 
 The project relies only on the Python standard library and `flask`. If `flask` is not available in your environment, install it locally.
-Set a `FLASK_SECRET_KEY` environment variable to secure session data.
+Set a `FLASK_SECRET_KEY` environment variable to secure session data. If you define `OPENAI_API_KEY`, the chat will forward questions to OpenAI when it cannot answer from the spreadsheet.
 
 ## Running the app
 
@@ -13,7 +13,7 @@ Set a `FLASK_SECRET_KEY` environment variable to secure session data.
 python3 app/main.py
 ```
 
-Then open `http://localhost:5000` in your browser to upload a workbook and view the dashboard.
+Then open `http://localhost:5000` in your browser. The home page shows a TRC-branded chat interface. Visit the dashboard to upload a workbook and enable data-related questions.
 
 ## Limitations
 

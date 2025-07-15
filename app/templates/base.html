@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}TRC Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+    function toggleMode() {
+        const body = document.body;
+        body.classList.toggle('dark');
+        localStorage.setItem('dark', body.classList.contains('dark'));
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('dark') === 'true') {
+            document.body.classList.add('dark');
+        }
+    });
+    </script>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="https://forecasting.therewardcollection.com">Forecasting</a>
+        <a href="{{ url_for('knowledge') }}">Knowledge Base</a>
+        <a href="{{ url_for('asset') }}">Asset Creation</a>
+        <a href="{{ url_for('email') }}">Email Dashboard</a>
+        <a href="{{ url_for('tools') }}">External Tools</a>
+    </nav>
+    <div class="mode-toggle" onclick="toggleMode()">Toggle Mode</div>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
