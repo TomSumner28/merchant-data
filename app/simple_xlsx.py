@@ -2,6 +2,11 @@ import zipfile
 import xml.etree.ElementTree as ET
 from typing import List, Dict
 
+
+def _normalize_header(text: str) -> str:
+    """Return a lowercase underscore version of the column header."""
+    return text.strip().lower().replace(" ", "_")
+
 NS_MAIN = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 NS_REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 
@@ -69,7 +74,7 @@ def read_workbook(path: str) -> Dict[str, List[Dict[str, str]]]:
             if not rows:
                 data[name] = []
                 continue
-            headers = rows[0]
+            headers = [_normalize_header(h) for h in rows[0]]
             sheet_data = []
             for r in rows[1:]:
                 item = {headers[i]: r[i] if i < len(r) else '' for i in range(len(headers))}

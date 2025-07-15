@@ -4,6 +4,29 @@
     <title>Dashboard</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJ7MGDz3I1kuui9rK/3HB+7ENqQkDoDib0yV0=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #eee;
+            margin: 40px;
+        }
+        h1, h2 {
+            color: #0ff;
+        }
+        canvas {
+            max-width: 600px;
+            margin-bottom: 30px;
+            background: #1e1e1e;
+            border-radius: 8px;
+        }
+        input, button {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            color: #eee;
+            padding: 5px 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Merchant Dashboard</h1>
@@ -36,6 +59,9 @@
     </div>
     <div style="max-width: 600px;">
         <canvas id="repTotalChart"></canvas>
+    </div>
+    <div style="max-width: 600px;">
+        <canvas id="cashbackRegionChart"></canvas>
     </div>
 
     <script>
@@ -126,6 +152,19 @@
                     label: 'Total merchants per rep',
                     data: Object.values(stats.sales_rep_counts),
                     backgroundColor: 'rgba(201, 203, 207, 0.5)',
+                }]
+            },
+        });
+
+        const cashbackRegionCtx = document.getElementById('cashbackRegionChart');
+        new Chart(cashbackRegionCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(stats.avg_cashback_per_region),
+                datasets: [{
+                    label: 'Avg cashback by region',
+                    data: Object.values(stats.avg_cashback_per_region),
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
                 }]
             },
         });

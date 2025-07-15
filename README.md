@@ -45,7 +45,7 @@ The app will download the sheet on start. If you deploy to a service like Vercel
 
 ## Dashboard features
 
-The dashboard presents several visual reports:
+The dashboard presents several visual reports and uses a dark theme:
 
 - Number of merchants in each deal stage
 - Merchants per region
@@ -70,6 +70,11 @@ Vercel Python runtime. Set the environment variables mentioned above in the
 Vercel project so the sheet is fetched during deployment. If you prefer a static
 preview only, replace this file with a configuration that serves the HTML
 directly.
+
+The built-in Excel reader normalizes column headers by converting them to
+lowercase and replacing spaces with underscores. Ensure your sheet includes
+columns like `deal_stage`, `region`, `sales_rep`, and `cashback` so the stats can
+be computed correctly.
 
 ## Limitations
 
