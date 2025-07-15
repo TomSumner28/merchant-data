@@ -4,7 +4,12 @@ This repository contains a simple Flask dashboard for viewing merchant data. The
 
 ## Requirements
 
-The project relies only on the Python standard library and `flask`. If `flask` is not available in your environment, install it locally.
+The project relies only on the Python standard library and `flask`. Install the
+dependency with:
+
+```bash
+pip install -r requirements.txt
+```
 
 Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private. When both are provided the app downloads the file using the Google Drive API.
 
