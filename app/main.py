@@ -10,6 +10,7 @@ from flask import (
 )
 from urllib.request import urlretrieve
 from tempfile import NamedTemporaryFile
+import json
 import os
 import sys
 
@@ -117,7 +118,11 @@ def _compute_stats(rows):
         'deal_stage_counts': {},
         'region_counts': {},
         'lost_count': 0,
+        'avg_cashback_live': 0.0,
+        'sales_rep_live_counts': {},
     }
+    cashback_total = 0.0
+    cashback_count = 0
     for row in rows:
         stage = row.get('deal_stage', 'Unknown')
         region = row.get('region', 'Unknown')
@@ -125,7 +130,16 @@ def _compute_stats(rows):
         stats['region_counts'][region] = stats['region_counts'].get(region, 0) + 1
         if stage.lower() in {'lost', 'churn', 'churned'}:
             stats['lost_count'] += 1
+        if stage.lower() == 'live':
+            rep = row.get('sales_rep', 'Unknown')
+            stats['sales_rep_live_counts'][rep] = stats['sales_rep_live_counts'].get(rep, 0) + 1
+            cb = _to_float(row.get('cashback', row.get('cashback_amount')))
+            if cb is not None:
+                cashback_total += cb
+                cashback_count += 1
     stats['lost_rate'] = (stats['lost_count'] / stats['total']) * 100 if stats['total'] else 0
+    if cashback_count:
+        stats['avg_cashback_live'] = cashback_total / cashback_count
     return stats
 
 
@@ -141,6 +155,7 @@ def dashboard():
         merchant_data=merchant_data,
         offs_data=offs_data,
         stats=stats,
+        stats_json=json.dumps(stats),
     )
 
 
@@ -160,11 +175,37 @@ def _answer_question(rows, question: str) -> str:
     q = question.lower()
     if 'live' in q:
         region = _extract_region(rows, q)
-        count = sum(1 for r in rows if r.get('deal_stage', '').lower() == 'live' and (not region or r.get('region', '').lower() == region.lower()))
-        return f'{count} retailers are live{f" in {region}" if region else ""}.'
+        rep = _extract_sales_rep(rows, q)
+        count = sum(
+            1
+            for r in rows
+            if r.get('deal_stage', '').lower() == 'live'
+            and (not region or r.get('region', '').lower() == region.lower())
+            and (not rep or r.get('sales_rep', '').lower() == rep.lower())
+        )
+        qualifiers = []
+        if rep:
+            qualifiers.append(rep.title())
+        if region:
+            qualifiers.append(region)
+        qualifier = ' in '.join(qualifiers) if qualifiers else ''
+        return f'{count} retailers are live{(" in " + qualifier) if qualifier else ""}.'
     if 'lost' in q and '2024' in q:
         count = sum(1 for r in rows if r.get('deal_stage', '').lower() == 'lost' and '2024' in str(r.get('lost_date', '')))
         return f'{count} retailers lost in 2024.'
+    if 'average cashback' in q:
+        region = _extract_region(rows, q)
+        values = [
+            _to_float(r.get('cashback', r.get('cashback_amount')))
+            for r in rows
+            if r.get('deal_stage', '').lower() == 'live'
+            and (not region or r.get('region', '').lower() == region.lower())
+        ]
+        values = [v for v in values if v is not None]
+        if not values:
+            return 'No cashback data available.'
+        avg = sum(values) / len(values)
+        return f'Average cashback{f" in {region}" if region else ""} is {avg:.2f}.'
     return 'Question not recognized.'
 
 
@@ -174,6 +215,21 @@ def _extract_region(rows, text: str):
         if region.lower() in text:
             return region
     return None
+
+
+def _extract_sales_rep(rows, text: str):
+    reps = {r.get('sales_rep', '') for r in rows if r.get('sales_rep')}
+    for rep in reps:
+        if rep.lower() in text:
+            return rep
+    return None
+
+
+def _to_float(value):
+    try:
+        return float(str(value).replace('%', '').strip())
+    except (TypeError, ValueError):
+        return None
 
 
 if __name__ == '__main__':

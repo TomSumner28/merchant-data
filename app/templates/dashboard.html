@@ -3,6 +3,7 @@
 <head>
     <title>Dashboard</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJ7MGDz3I1kuui9rK/3HB+7ENqQkDoDib0yV0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Merchant Dashboard</h1>
@@ -16,24 +17,69 @@
     <h2>Stats</h2>
     <p>Total merchants: {{ stats.total }}</p>
     <p>Lost rate: {{ '%.2f' % stats.lost_rate }}%</p>
-    <h3>Deal Stage Counts</h3>
-    <ul>
-        {% for stage, count in stats.deal_stage_counts.items() %}
-            <li>{{ stage }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
-    <h3>Region Counts</h3>
-    <ul>
-        {% for region, count in stats.region_counts.items() %}
-            <li>{{ region }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
+    <p>Average cashback (live): {{ '%.2f' % stats.avg_cashback_live }}</p>
+
+    <div style="max-width: 600px;">
+        <canvas id="dealStageChart"></canvas>
+    </div>
+    <div style="max-width: 600px;">
+        <canvas id="regionChart"></canvas>
+    </div>
+    <div style="max-width: 600px;">
+        <canvas id="salesRepChart"></canvas>
+    </div>
+
     <script>
         $('#ask-form').on('submit', function(e){
             e.preventDefault();
             $.post($(this).attr('action'), $(this).serialize(), function(data){
                 $('#answer').text(data.answer);
             });
+        });
+
+        const stats = {{ stats_json|safe }};
+        const dealStageCtx = document.getElementById('dealStageChart');
+        new Chart(dealStageCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(stats.deal_stage_counts),
+                datasets: [{
+                    label: 'Deal stages',
+                    data: Object.values(stats.deal_stage_counts),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                }]
+            },
+        });
+
+        const regionCtx = document.getElementById('regionChart');
+        new Chart(regionCtx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(stats.region_counts),
+                datasets: [{
+                    label: 'Regions',
+                    data: Object.values(stats.region_counts),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                }]
+            },
+        });
+
+        const salesRepCtx = document.getElementById('salesRepChart');
+        new Chart(salesRepCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(stats.sales_rep_live_counts),
+                datasets: [{
+                    label: 'Live retailers per rep',
+                    data: Object.values(stats.sales_rep_live_counts),
+                    backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                }]
+            },
         });
     </script>
 </body>

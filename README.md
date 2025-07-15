@@ -18,7 +18,20 @@ python3 app/main.py
 The script automatically adjusts the Python path so it can be executed from the
 repository root without additional configuration.
 
+
 Then open `http://localhost:5000` in your browser. The application downloads the workbook from Google Sheets and displays the dashboard automatically. Ensure the environment variables mentioned above are set so the sheet can be retrieved.
+
+## Dashboard features
+
+The dashboard presents several visual reports:
+
+- Number of merchants in each deal stage
+- Merchants per region
+- Live merchants per sales rep
+- Average cashback across live merchants
+
+Charts are rendered using Chart.js and an AI question bar lets you ask quick
+queries such as "How many retailers does Lucy have live in the USA?".
 
 If you only want to preview the design without running the Flask server, open
 `index.html` in your browser. It links to a sample dashboard page with
