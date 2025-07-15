@@ -1,7 +1,4 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    {"source": "/dashboard", "destination": "/dashboard.html"},
-    {"source": "/", "destination": "/index.html"}
-  ]
+  "builds": [{"src": "api/index.py", "use": "@vercel/python"}],
+  "routes": [{"src": "/(.*)", "dest": "api/index.py"}]
 }

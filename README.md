@@ -68,9 +68,11 @@ the back-end logic. These HTML files can also be deployed as a static site.
 Deploying `index.html` and `dashboard.html` to a service such as Vercel will
 give you a read-only preview of the interface without any back‑end.
 
-The repository includes a `vercel.json` file that rewrites `/` to `index.html`
-and `/dashboard` to `dashboard.html` so the static pages can be hosted on
-Vercel. Remove or change this file if you wish to run the Flask server instead.
+For a live deployment, the repository provides a `vercel.json` file that tells
+Vercel to run the Flask app with its Python runtime. When deployed this way the
+app automatically downloads the configured Google Sheet and serves the
+dashboard dynamically. If you only need the static demo remove or replace this
+file.
 
 The built-in Excel reader normalizes column headers by converting them to
 lowercase and replacing spaces with underscores. Ensure your sheet includes
