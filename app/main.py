@@ -130,6 +130,7 @@ def index():
         flash("Data loaded from Google Sheets.")
     except Exception as e:
         flash(f"Failed to load Google Sheet: {e}")
+        print(f"Exception when fetching sheet: {e}")
         user_data[sid] = {}
     return redirect(url_for("dashboard"))
 
@@ -143,6 +144,7 @@ def load():
         flash('Data loaded from Google Sheets.')
     except Exception as e:
         flash(f'Failed to load Google Sheet: {e}')
+        print(f"Exception when fetching sheet: {e}")
         user_data[sid] = {}
     return redirect(url_for('dashboard'))
 
