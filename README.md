@@ -6,7 +6,7 @@ This repository contains a simple Flask dashboard for viewing merchant data. The
 
 The project relies only on the Python standard library and `flask`. If `flask` is not available in your environment, install it locally.
 
-Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private.  When both are provided the app downloads the file using the Google Drive API.
+Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private. When both are provided the app downloads the file using the Google Drive API.
 
 Set `FLASK_SECRET_KEY` in your environment for session security. A default value is used if not provided.
 
@@ -20,6 +20,20 @@ repository root without additional configuration.
 
 
 Then open `http://localhost:5000` in your browser. The application downloads the workbook from Google Sheets and displays the dashboard automatically. Ensure the environment variables mentioned above are set so the sheet can be retrieved.
+
+### Connecting your Google Sheet
+
+1. Open your workbook in the browser and copy the long ID from the URL.
+2. Export this value in your shell before running the app:
+
+   ```bash
+   export GOOGLE_SHEETS_ID="<YOUR_SHEET_ID>"
+   export GOOGLE_API_KEY="<YOUR_API_KEY>"   # optional if the sheet is public
+   export FLASK_SECRET_KEY="$(openssl rand -hex 16)"
+   python3 app/main.py
+   ```
+
+The app will download the sheet on start. If you deploy to a service like Vercel, set these variables in the environment configuration so the same sheet is used.
 
 ## Dashboard features
 
@@ -37,6 +51,8 @@ If you only want to preview the design without running the Flask server, open
 `index.html` in your browser. It links to a sample dashboard page with
 placeholder data so you can verify the site deploys correctly before enabling
 the back-end logic. These HTML files can also be deployed as a static site.
+Deploying `index.html` and `dashboard.html` to a service such as Vercel will
+give you a read-only preview of the interface without any back‑end.
 
 For example, the repository includes a `vercel.json` configuration so the
 contents can be hosted on Vercel without Next.js. Deployment will serve

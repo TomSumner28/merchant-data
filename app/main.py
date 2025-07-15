@@ -34,6 +34,17 @@ def _get_session_id() -> str:
         session['sid'] = sid
     return sid
 
+
+def _generate_csrf_token() -> str:
+    token = session.get('_csrf_token')
+    if not token:
+        token = os.urandom(16).hex()
+        session['_csrf_token'] = token
+    return token
+
+
+app.jinja_env.globals['csrf_token'] = _generate_csrf_token
+
 # Public Google Sheets document containing the data
 # The sheet ID and API key can be provided via environment variables so
 # private sheets can be accessed.  If not set, a demo sheet is used.
