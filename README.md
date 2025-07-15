@@ -26,7 +26,7 @@ The script automatically adjusts the Python path so it can be executed from the
 repository root without additional configuration.
 
 
-Then open `http://localhost:5000` in your browser and click **"Load data from Google Sheets"**. The server prints the resolved sheet ID and whether an API key is detected when it starts. Check these logs if live data does not appear.
+Open `http://localhost:5000` in your browser. The app will automatically download the configured Google Sheet and redirect you to the dashboard. If fetching fails you can visit `/load` to retry. The server prints the resolved sheet ID and whether an API key is detected when it starts. Check these logs if live data does not appear.
 
 ### Connecting your Google Sheet
 

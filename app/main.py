@@ -100,9 +100,13 @@ def _fetch_sheet() -> dict:
 
 
 def _get_sheet(data: dict, name: str):
-    """Return sheet rows for the given name, ignoring case."""
+    """Return sheet rows matching the given name, ignoring case and spaces."""
+    if not data:
+        return []
+    norm = name.lower().replace(" ", "")
     for key, rows in data.items():
-        if key.lower() == name.lower():
+        key_norm = key.lower().replace(" ", "")
+        if key_norm == norm or norm in key_norm:
             return rows
     return []
 
@@ -136,8 +140,17 @@ def _chat_with_gpt(question: str, context: str = "") -> str:
 
 @app.route('/')
 def index():
-    """Render the home page with an option to load data."""
-    return render_template('index.html')
+    """Load data if needed and show the dashboard."""
+    sid = _get_session_id()
+    if sid not in user_data:
+        try:
+            user_data[sid] = _fetch_sheet()
+            flash('Data loaded from Google Sheets.')
+        except Exception as e:
+            flash(f'Failed to load Google Sheet: {e}')
+            print(f"Exception when fetching sheet: {e}")
+            user_data[sid] = {}
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/load')
