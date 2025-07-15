@@ -8,7 +8,7 @@ from flask import (
     session,
     abort,
 )
-from urllib.request import urlretrieve
+from urllib.request import urlretrieve, Request, urlopen
 from tempfile import NamedTemporaryFile
 import json
 import os
@@ -92,6 +92,34 @@ def _get_sheet(data: dict, name: str):
         if key.lower() == name.lower():
             return rows
     return []
+
+
+def _chat_with_gpt(question: str, context: str = "") -> str:
+    """Send the question to OpenAI and return the response."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return "OpenAI API key not configured."
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+    ]
+    if context:
+        messages.append({"role": "system", "content": context})
+    messages.append({"role": "user", "content": question})
+    payload = json.dumps({"model": "gpt-3.5-turbo", "messages": messages}).encode("utf-8")
+    req = Request(
+        "https://api.openai.com/v1/chat/completions",
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+    )
+    try:
+        with urlopen(req) as resp:
+            data = json.loads(resp.read())
+            return data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+    except Exception as e:
+        return f"OpenAI request failed: {e}"
 
 @app.route('/')
 def index():
@@ -216,12 +244,13 @@ def ask():
     sid = _get_session_id()
     data = user_data.get(sid, {})
     merchant_data = _get_sheet(data, 'merchant list')
+    stats = _compute_stats(merchant_data) if merchant_data else {}
     question = request.form.get('question', '')
-    answer = _answer_question(merchant_data, question)
+    answer = _answer_question(merchant_data, question, stats)
     return {'answer': answer}
 
 
-def _answer_question(rows, question: str) -> str:
+def _answer_question(rows, question: str, stats: dict) -> str:
     if not rows:
         return 'No data loaded.'
     q = question.lower()
@@ -258,7 +287,8 @@ def _answer_question(rows, question: str) -> str:
             return 'No cashback data available.'
         avg = sum(values) / len(values)
         return f'Average cashback{f" in {region}" if region else ""} is {avg:.2f}.'
-    return 'Question not recognized.'
+    context = f"Current stats: {json.dumps(stats)}"
+    return _chat_with_gpt(question, context)
 
 
 def _extract_region(rows, text: str):

@@ -14,6 +14,8 @@ pip install -r requirements.txt
 Set `GOOGLE_SHEETS_ID` to the ID of your workbook and `GOOGLE_API_KEY` if the sheet is private. When both are provided the app downloads the file using the Google Drive API.
 If these variables are not set the dashboard uses the public TRC Master List for demonstration purposes.
 
+To enable AI answers for general questions, set `OPENAI_API_KEY` with an OpenAI API token. Without this the Ask bar only responds to built-in data queries.
+
 Set `FLASK_SECRET_KEY` in your environment for session security. A default value is used if not provided.
 
 ## Running the app
@@ -38,6 +40,7 @@ starts. Check these logs if live data does not appear.
    export GOOGLE_SHEETS_ID="<YOUR_SHEET_ID>"
    export GOOGLE_API_KEY="<YOUR_API_KEY>"   # optional if the sheet is public
    export FLASK_SECRET_KEY="$(openssl rand -hex 16)"
+   export OPENAI_API_KEY="<YOUR_OPENAI_KEY>"  # optional for GPT answers
    python3 app/main.py
    ```
 
