@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { supabase, uploadKnowledgeFile } from '../lib/supabaseClient'
 
 export default function KnowledgeBase() {
   if (!supabase) {
@@ -20,7 +20,7 @@ export default function KnowledgeBase() {
   }, [])
 
   async function fetchFiles() {
-    const { data, error } = await supabase.storage.from('knowledge-base').list('', {limit: 100})
+    const { data, error } = await supabase.storage.from('knowledge-base').list('uploads', { limit: 100 })
     if (!error) setFiles(data)
   }
 
@@ -29,14 +29,14 @@ export default function KnowledgeBase() {
     if (!fileList?.length) return
     setUploading(true)
     for (const file of fileList) {
-      await supabase.storage.from('knowledge-base').upload(file.name, file, { upsert: true })
+      await uploadKnowledgeFile(file)
     }
     setUploading(false)
     await fetchFiles()
   }
 
   async function handleDelete(name) {
-    await supabase.storage.from('knowledge-base').remove([name])
+    await supabase.storage.from('knowledge-base').remove([`uploads/${name}`])
     await fetchFiles()
   }
 
