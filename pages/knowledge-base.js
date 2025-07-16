@@ -20,7 +20,7 @@ export default function KnowledgeBase() {
   }, [])
 
   async function fetchFiles() {
-    const { data, error } = await supabase.storage.from('knowledge-base').list('uploads', { limit: 100 })
+    const { data, error } = await supabase.storage.from('knowledge-base').list('', { limit: 100 })
     if (!error) setFiles(data)
   }
 
@@ -36,7 +36,7 @@ export default function KnowledgeBase() {
   }
 
   async function handleDelete(name) {
-    await supabase.storage.from('knowledge-base').remove([`uploads/${name}`])
+    await supabase.storage.from('knowledge-base').remove([name])
     await fetchFiles()
   }
 
@@ -56,12 +56,15 @@ export default function KnowledgeBase() {
       </div>
       {uploading && <p>Uploading...</p>}
       <ul>
-        {files?.map(f => (
-          <li key={f.name} style={{ marginBottom: 10 }}>
-            {f.name}
-            <button style={{ marginLeft: 10 }} onClick={() => handleDelete(f.name)}>Delete</button>
-          </li>
-        ))}
+        {files?.map(f => {
+          const url = supabase.storage.from('knowledge-base').getPublicUrl(f.name).data.publicUrl
+          return (
+            <li key={f.name} style={{ marginBottom: 10 }}>
+              <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: '#5ec2f7' }}>{f.name}</a>
+              <button style={{ marginLeft: 10 }} onClick={() => handleDelete(f.name)}>Delete</button>
+            </li>
+          )
+        })}
       </ul>
     </div>
   )

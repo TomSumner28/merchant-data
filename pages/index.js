@@ -22,19 +22,22 @@ export default function Home() {
     <div style={{ padding: 20 }}>
       <h1 style={{ color: '#5ec2f7' }}>Ask TRC AI</h1>
       <div style={{ marginBottom: 20 }}>
-        <input
-          type="text"
+        <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask a question"
-          style={{ padding: 10, width: '60%' }}
+          placeholder="Paste an email or ask a question"
+          rows={10}
+          style={{ padding: 10, width: '100%' }}
         />
-        <button onClick={handleQuery} style={{ marginLeft: 10, padding: '10px 20px' }}>Ask AI</button>
+        <div style={{ marginTop: 10 }}>
+          <button onClick={handleQuery} style={{ padding: '10px 20px' }}>Ask AI</button>
+        </div>
       </div>
       {loading && <p>Thinking...</p>}
       {response && (
         <div style={{ marginBottom: 20, backgroundColor: '#1a1a1a', padding: 10 }}>
-          <strong>AI Response:</strong> {response}
+          <strong>Email Response:</strong>
+          <pre style={{ whiteSpace: 'pre-wrap' }}>{response}</pre>
         </div>
       )}
     </div>

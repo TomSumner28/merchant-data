@@ -10,7 +10,10 @@ export default async function handler(req, res) {
   try {
     const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: query }]
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant that replies in a professional email format.' },
+        { role: 'user', content: query }
+      ]
     }, {
       headers: {
         'Content-Type': 'application/json',

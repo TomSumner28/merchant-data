@@ -5,7 +5,7 @@ This project provides an interface for the Reward Collection tools. Files upload
 ## Supabase Setup
 
 1. [Create a Supabase project](https://supabase.com/).
-2. In your project, create a **public bucket** named `knowledge-base`. Files are stored in an `uploads` folder within this bucket (it will be created automatically).
+2. In your project, create a **public bucket** named `knowledge-base`. Files are stored directly at the root of this bucket.
 3. Copy your project URL and anon key from the Supabase dashboard.
 4. Create a `.env.local` file in this repo and set:
    ```
