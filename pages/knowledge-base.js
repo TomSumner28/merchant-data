@@ -2,6 +2,15 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function KnowledgeBase() {
+  if (!supabase) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h1 style={{ color: '#5ec2f7' }}>Knowledge Base</h1>
+        <p>Supabase is not configured. Provide environment variables to enable storage.</p>
+      </div>
+    )
+  }
+
   const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)

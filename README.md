@@ -11,6 +11,7 @@ This project provides an interface for the Reward Collection tools. Files upload
    ```
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   OPENAI_API_KEY=your-openai-key
    ```
 5. Install dependencies and run the development server:
    ```
