@@ -37,9 +37,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1 style={{ color: '#5ec2f7' }}>Ask TRC AI</h1>
-
-      <h2>Ask TRC</h2>
+      <h2 style={{ color: '#5ec2f7' }}>Ask TRC</h2>
       <div style={{ marginBottom: 20 }}>
         <input
           type="text"
