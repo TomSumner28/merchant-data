@@ -4,7 +4,24 @@ export default function ExternalTools() {
     { name: 'Chaser', url: 'https://chaserhq.com/' }
   ];
   const sales = [
-    { name: 'HubSpot', url: 'https://app.hubspot.com/' }
+    { name: 'Hubspot', url: 'https://app.hubspot.com/' },
+    { name: 'SimilarWeb', url: 'https://secure.similarweb.com/' },
+    { name: 'Wiza', url: 'https://wiza.co/' },
+    { name: 'Deal Deck', url: 'https://www.dealdeck.ai/' },
+    { name: 'LinkedIn', url: 'https://www.linkedin.com/' },
+    { name: 'Awin', url: 'https://ui.awin.com/' },
+    { name: 'Impact', url: 'https://app.impact.com/' },
+    { name: 'Rakuten', url: 'https://rakutenadvertising.com/' },
+    { name: 'Share a Sale', url: 'https://www.shareasale.com/' },
+    { name: 'Pepper Jam / Ascend', url: 'https://id.pepperjam.com/' },
+    { name: 'CJ', url: 'https://www.cj.com/' },
+    { name: 'Partnerize', url: 'https://partnerize.com/' },
+    { name: 'Trade Doubler', url: 'https://www.tradedoubler.com/' },
+    { name: 'Flex Offers', url: 'https://www.flexoffers.com/' },
+    { name: 'Partner Stack', url: 'https://partnerstack.com/' },
+    { name: 'Everflow', url: 'https://www.everflow.io/' },
+    { name: 'Foxit', url: 'https://account.foxit.com/' },
+    { name: 'Credit Safe', url: 'https://app.creditsafe.com/' }
   ];
   const admin = [
     { name: 'Google Workspace', url: 'https://workspace.google.com/' },
