@@ -14,11 +14,27 @@ const zones = [
 
 export default function TimeZoneTracker() {
   const [now, setNow] = useState(new Date())
+  const [query, setQuery] = useState('')
+  const [response, setResponse] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(interval)
   }, [])
+
+  async function handleAsk() {
+    if (!query) return
+    setLoading(true)
+    const res = await fetch('/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    })
+    const data = await res.json()
+    setResponse(data.result)
+    setLoading(false)
+  }
 
   const formatTime = (tz) =>
     new Intl.DateTimeFormat('en-GB', {
@@ -39,6 +55,24 @@ export default function TimeZoneTracker() {
           </li>
         ))}
       </ul>
+      <div style={{ marginTop: 20 }}>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="What time is it in the UK if it's 14:30 in UTC timezone"
+          style={{ padding: 10, width: '100%' }}
+        />
+        <div style={{ marginTop: 10 }}>
+          <button onClick={handleAsk} style={{ padding: '10px 20px' }}>Ask</button>
+        </div>
+      </div>
+      {loading && <p>Thinking...</p>}
+      {response && (
+        <div style={{ marginTop: 10, backgroundColor: '#1a1a1a', padding: 10 }}>
+          <pre style={{ whiteSpace: 'pre-wrap' }}>{response}</pre>
+        </div>
+      )}
     </div>
   )
 }
