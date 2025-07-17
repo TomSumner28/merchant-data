@@ -8,3 +8,8 @@ body {
 a {
   text-decoration: none;
 }
+
+body.light-mode {
+  background: #fff;
+  color: #000;
+}
