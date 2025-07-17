@@ -5,12 +5,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { query, email } = req.body
+  const { query, email, short } = req.body
 
   try {
-    const systemMessage = email
-      ? 'You are a helpful assistant that replies in a professional email format.'
-      : 'You are a helpful assistant.'
+    let systemMessage = 'You are a helpful assistant.'
+    if (email) {
+      systemMessage = 'You are a helpful assistant that replies in a professional email format.'
+    } else if (short) {
+      systemMessage = 'You answer timezone questions with only the converted time in HH:mm format without extra commentary.'
+    }
     const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-3.5-turbo',
       messages: [
