@@ -23,9 +23,27 @@ export default function ExternalTools() {
     { name: 'Foxit', url: 'https://account.foxit.com/' },
     { name: 'Credit Safe', url: 'https://app.creditsafe.com/' }
   ];
+  const accountManagement = [
+    { name: 'HubSpot', url: 'https://app.hubspot.com/' },
+    { name: 'Fyxer', url: 'https://app.fyxer.com/' },
+    { name: 'Fidel API Dashboard', url: 'https://dashboard.fidel.uk/' },
+    { name: 'Fidel Metabase', url: 'https://analytics.fidel.uk/' },
+    { name: 'Microsoft Teams', url: 'https://teams.microsoft.com/' },
+    { name: 'Fireflies', url: 'https://app.fireflies.ai/' },
+    { name: 'Trello', url: 'https://trello.com/' },
+    { name: 'Linkedin', url: 'https://www.linkedin.com/' },
+    { name: 'Similarweb', url: 'https://pro.similarweb.com/' },
+    { name: 'Xero', url: 'https://go.xero.com/' },
+    { name: 'Canva', url: 'https://www.canva.com/' }
+  ];
   const admin = [
-    { name: 'Google Workspace', url: 'https://workspace.google.com/' },
-    { name: 'Slack', url: 'https://slack.com/' }
+    { name: 'Xero', url: 'https://go.xero.com/' },
+    { name: 'Kleercard', url: 'https://kleercard.com/' },
+    { name: 'Trello', url: 'https://trello.com/' },
+    { name: 'Microsoft Teams', url: 'https://teams.microsoft.com/' },
+    { name: 'Fidel API Dashboard', url: 'https://dashboard.fidel.uk/' },
+    { name: 'Fidel Metabase', url: 'https://analytics.fidel.uk/' },
+    { name: 'HubSpot', url: 'https://app.hubspot.com/' }
   ];
 
   const renderList = (items) => (
@@ -43,8 +61,10 @@ export default function ExternalTools() {
       <h1 style={{ color: '#5ec2f7' }}>External Tools</h1>
       <h2>Finance</h2>
       {renderList(finance)}
-      <h2>Sales &amp; Account Management</h2>
+      <h2>Sales</h2>
       {renderList(sales)}
+      <h2>Account Management</h2>
+      {renderList(accountManagement)}
       <h2>Admin</h2>
       {renderList(admin)}
     </div>
