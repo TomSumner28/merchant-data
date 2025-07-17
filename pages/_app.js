@@ -10,6 +10,7 @@ function MyApp({ Component, pageProps }) {
         <Link href="/knowledge-base" style={{ color: '#fff' }}>Knowledge Base</Link>
         <Link href="/asset-creation" style={{ color: '#fff' }}>Asset Creation</Link>
         <Link href="/external-tools" style={{ color: '#fff' }}>External Tools</Link>
+        <Link href="/time-zone-tracker" style={{ color: '#fff' }}>Time Zone Tracker</Link>
         <Link href="/dashboard" style={{ color: '#fff' }}>Dashboard</Link>
       </nav>
       <Component {...pageProps} />
