@@ -5,13 +5,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { query } = req.body;
+  const { query, email } = req.body
 
   try {
+    const systemMessage = email
+      ? 'You are a helpful assistant that replies in a professional email format.'
+      : 'You are a helpful assistant.'
     const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a helpful assistant that replies in a professional email format.' },
+        { role: 'system', content: systemMessage },
         { role: 'user', content: query }
       ]
     }, {
