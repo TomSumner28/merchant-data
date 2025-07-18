@@ -28,7 +28,16 @@ This project provides an interface for the Reward Collection tools. Files for th
    );
    ```
 6. Enable Row Level Security and add policies allowing inserts/selects for anonymous users on `knowledge_base` and `knowledge_base_entries`.
-7. Install dependencies and run the development server:
+
+7. Create an Edge Function `extract-text-from-upload` that listens for `storage.object.created` events on the `knowledge_base` bucket. The function downloads the new file, extracts text, and inserts a row into `knowledge_base_entries`. Deploy it with:
+   ```bash
+   supabase functions deploy extract-text-from-upload --no-verify-jwt
+   supabase functions invoke extract-text-from-upload
+   ```
+   Ensure the following environment variables are provided when deploying:
+   `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+
+8. Install dependencies and run the development server:
    ```
    npm install
    npm run dev
