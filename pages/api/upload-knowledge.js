@@ -17,8 +17,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabase =
   supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
 
-async function parseFile(file, type) {
-  const buffer = await fs.promises.readFile(file.filepath)
+async function parseFile(buffer, type) {
   switch (type) {
     case 'pdf':
       return (await pdfParse(buffer)).text
@@ -59,9 +58,11 @@ export default async function handler(req, res) {
       const ext = file.originalFilename.split('.').pop().toLowerCase()
       const path = `uploads/${Date.now()}_${file.originalFilename}`
 
+      const buffer = await fs.promises.readFile(file.filepath)
+
       const { error: upErr } = await supabase.storage
         .from('knowledge_base')
-        .upload(path, fs.createReadStream(file.filepath), {
+        .upload(path, buffer, {
           contentType: file.mimetype,
           cacheControl: '3600',
           upsert: false,
@@ -74,7 +75,7 @@ export default async function handler(req, res) {
 
       let text = ''
       try {
-        text = await parseFile(file, ext)
+        text = await parseFile(buffer, ext)
       } catch (e) {
         console.error('Parse error:', e)
       }
