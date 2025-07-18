@@ -23,7 +23,11 @@ serve(async (req) => {
   }
 
   const supabase = createClient(supabaseUrl, serviceKey, {
-    global: { headers: { authorization: `Bearer ${serviceKey}` } },
+    global: {
+      headers: {
+        authorization: `Bearer ${serviceKey}`,
+      },
+    },
   });
 
   const { data: file, error } = await supabase.storage
