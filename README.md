@@ -22,3 +22,5 @@ This project provides an interface for the Reward Collection tools. Files upload
 Use the `uploadKnowledgeFile` helper from `lib/supabaseClient.js` to upload files into the `knowledge-base` bucket.
 
 The Knowledge Base page will allow you to upload images, PDFs and spreadsheets to Supabase Storage and remove them when needed.
+
+The home page includes a Draft Reply tool that can generate email responses. Use the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales, Account Manager or Legal.

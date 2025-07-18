@@ -8,6 +8,7 @@ export default function Home() {
   const [draftInput, setDraftInput] = useState('')
   const [draftResponse, setDraftResponse] = useState('')
   const [loadingDraft, setLoadingDraft] = useState(false)
+  const [tone, setTone] = useState('general')
 
   const handleAsk = async () => {
     if (!askInput) return
@@ -28,7 +29,7 @@ export default function Home() {
     const res = await fetch('/api/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: draftInput, email: true })
+      body: JSON.stringify({ query: draftInput, email: true, tone })
     })
     const data = await res.json()
     setDraftResponse(data.result)
@@ -66,8 +67,19 @@ export default function Home() {
           rows={10}
           style={{ padding: 10, width: '100%' }}
         />
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <button onClick={handleDraft} style={{ padding: '10px 20px' }}>Generate</button>
+          <label style={{ color: '#5ec2f7' }}>
+            Tone Enhancer:
+            <select value={tone} onChange={(e) => setTone(e.target.value)} style={{ marginLeft: '0.5rem' }}>
+              <option value="general">General</option>
+              <option value="sales">Sales</option>
+              <option value="account manager">Account Manager</option>
+              <option value="credit control">Credit Control</option>
+              <option value="legal">Legal</option>
+              <option value="exec team">Exec Team</option>
+            </select>
+          </label>
         </div>
       </div>
       {loadingDraft && <p>Thinking...</p>}
