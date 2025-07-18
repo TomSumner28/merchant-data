@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import formidable from 'formidable'
+import { IncomingForm } from 'formidable'
 import fs from 'fs'
 import pdfParse from 'pdf-parse'
 import mammoth from 'mammoth'
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Supabase not configured' })
   }
 
-  const form = new formidable.IncomingForm()
+  const form = new IncomingForm()
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
