@@ -1,44 +1,45 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
 export default function KnowledgeBase() {
 
   const [files, setFiles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     fetchFiles()
   }, [])
 
   async function fetchFiles() {
-    const res = await fetch('/api/files')
-    const json = await res.json()
-    setFiles(json.files || [])
+    if (!supabase) return
+    setLoading(true)
+    setError(null)
+    const { data, error } = await supabase.storage
+      .from('knowledge-base')
+      .list('', { limit: 100 })
+    if (error) {
+      setError(error.message)
+      setFiles([])
+    } else {
+      setFiles(data || [])
+    }
+    setLoading(false)
   }
 
-  async function handleDelete(entry) {
-    await fetch(`/api/files?path=${encodeURIComponent(entry.file_url)}`, {
-      method: 'DELETE'
-    })
-    fetchFiles()
-  }
+
 
   return (
     <div style={{ padding: 20 }}>
       <h1 style={{ color: '#5ec2f7' }}>Knowledge Base</h1>
       <p>Files stored in Supabase are listed below.</p>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {!loading && files.length === 0 && <p>No files found</p>}
       <ul>
-        {files?.map((entry) => (
-          <li key={entry.file_url} style={{ marginBottom: 10 }}>
-            <a
-              href={entry.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#5ec2f7' }}
-            >
-              {entry.file_name}
-            </a>
-            <button style={{ marginLeft: 10 }} onClick={() => handleDelete(entry)}>
-              Delete
-            </button>
+        {files.map((f) => (
+          <li key={f.name} style={{ marginBottom: 10 }}>
+            {f.name}
           </li>
         ))}
       </ul>
