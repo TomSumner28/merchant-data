@@ -15,6 +15,8 @@ This project provides an interface for the Reward Collection tools. Files for th
    NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    OPENAI_API_KEY=your-openai-key
+   SUPABASE_URL=your-project-url
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
    ```
 5. Create the table used to store extracted text:
    ```sql
@@ -46,5 +48,7 @@ This project provides an interface for the Reward Collection tools. Files for th
 The Knowledge Base page lists the files stored in your `knowledge_base` bucket
 by calling an API route that retrieves file names from Supabase. Add new files
 directly in Supabase; once uploaded they appear automatically on the site.
+Use the **Sync with Backend** button on that page to parse any newly uploaded
+files and store their contents in the `knowledge_base_entries` table.
 
 The home page includes a Draft Reply tool that can generate email responses. Use the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales, Account Manager or Legal.
