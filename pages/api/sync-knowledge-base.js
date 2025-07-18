@@ -1,4 +1,3 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import pdfParse from 'pdf-parse'
 import mammoth from 'mammoth'
@@ -9,7 +8,7 @@ const supabaseUrl = process.env.SUPABASE_URL
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const supabase = supabaseUrl && serviceKey ? createClient(supabaseUrl, serviceKey) : null
 
-async function extractText(buffer: Buffer, ext: string): Promise<string> {
+async function extractText(buffer, ext) {
   switch (ext) {
     case 'pdf':
       return (await pdfParse(buffer)).text
@@ -34,7 +33,7 @@ async function extractText(buffer: Buffer, ext: string): Promise<string> {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
   if (!supabase) {
     return res.status(500).json({ error: 'Supabase not configured' })
   }
