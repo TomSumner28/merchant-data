@@ -42,22 +42,39 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { data: fileList, error } = await supabase.storage.from('knowledge_base').list('')
-  if (error) {
-    console.error('List error:', error)
-    return res.status(500).json({ error: 'Failed to list files' })
+  const prefixes = ['', 'uploads']
+  let allFiles = []
+  for (const prefix of prefixes) {
+    const { data, error } = await supabase.storage
+      .from('knowledge_base')
+      .list(prefix)
+    if (error) {
+      console.error('List error:', error)
+      continue
+    }
+    if (data) {
+      allFiles = allFiles.concat(
+        data
+          .filter((f) => f.metadata) // skip folders
+          .map((f) => ({
+            name: f.name,
+            path: prefix ? `${prefix}/${f.name}` : f.name,
+          }))
+      )
+    }
   }
 
   let processed = 0
   let skipped = 0
 
-  for (const file of fileList || []) {
+  for (const file of allFiles) {
     const fileName = file.name
+    const filePath = file.path
 
     const { data: existing } = await supabase
       .from('knowledge_base_entries')
       .select('id')
-      .eq('file_name', fileName)
+      .eq('file_url', filePath)
       .maybeSingle()
 
     if (existing) {
@@ -67,7 +84,7 @@ export default async function handler(req, res) {
 
     const { data: downloadData, error: downloadErr } = await supabase.storage
       .from('knowledge_base')
-      .download(fileName)
+      .download(filePath)
     if (downloadErr || !downloadData) {
       console.error('Download error:', downloadErr)
       continue
@@ -82,11 +99,13 @@ export default async function handler(req, res) {
       console.error('Extract error:', e)
     }
 
-    const { data: publicData } = supabase.storage.from('knowledge_base').getPublicUrl(fileName)
+    const { data: publicData } = supabase.storage
+      .from('knowledge_base')
+      .getPublicUrl(filePath)
 
     await supabase.from('knowledge_base_entries').insert({
       file_name: fileName,
-      file_url: fileName,
+      file_url: publicData.publicUrl,
       file_type: ext,
       extracted_text: text,
     })

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabaseClient'
 
 export default function KnowledgeBase() {
 
@@ -13,17 +12,20 @@ export default function KnowledgeBase() {
   }, [])
 
   async function fetchFiles() {
-    if (!supabase) return
     setLoading(true)
     setError(null)
-    const { data, error } = await supabase.storage
-      .from('knowledge-base')
-      .list('', { limit: 100 })
-    if (error) {
-      setError(error.message)
+    try {
+      const res = await fetch('/api/files')
+      const json = await res.json()
+      if (res.ok) {
+        setFiles(json.files)
+      } else {
+        setError(json.error || 'Failed to load files')
+        setFiles([])
+      }
+    } catch (e) {
+      setError('Failed to load files')
       setFiles([])
-    } else {
-      setFiles(data || [])
     }
     setLoading(false)
   }
@@ -59,8 +61,10 @@ export default function KnowledgeBase() {
       {!loading && files.length === 0 && <p>No files found</p>}
       <ul>
         {files.map((f) => (
-          <li key={f.name} style={{ marginBottom: 10 }}>
-            {f.name}
+          <li key={f.file_url} style={{ marginBottom: 10 }}>
+            <a href={f.url} target="_blank" rel="noopener noreferrer">
+              {f.file_name}
+            </a>
           </li>
         ))}
       </ul>
