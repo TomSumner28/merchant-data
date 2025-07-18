@@ -1,4 +1,10 @@
-import axios from 'axios';
+import axios from 'axios'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabase =
+  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -9,6 +15,7 @@ export default async function handler(req, res) {
 
   try {
     let systemMessage = 'You are a helpful assistant.'
+    let kbContext = ''
     if (email) {
       systemMessage = 'You are a helpful assistant that replies in a professional email format.'
       if (tone && tone !== 'general') {
@@ -32,15 +39,30 @@ export default async function handler(req, res) {
             break
         }
       }
+      if (supabase) {
+        const { data } = await supabase
+          .from('knowledge_base_entries')
+          .select('extracted_text')
+          .order('uploaded_at', { ascending: false })
+          .limit(5)
+        if (data) {
+          kbContext = data.map((d) => d.extracted_text).join('\n')
+        }
+      }
     } else if (short) {
       systemMessage = 'You answer timezone questions with only the converted time in HH:mm format without extra commentary.'
     }
+    const messages = [
+      { role: 'system', content: systemMessage },
+    ]
+    if (kbContext) {
+      messages.push({ role: 'system', content: kbContext.slice(0, 4000) })
+    }
+    messages.push({ role: 'user', content: query })
+
     const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: systemMessage },
-        { role: 'user', content: query }
-      ]
+      messages
     }, {
       headers: {
         'Content-Type': 'application/json',
