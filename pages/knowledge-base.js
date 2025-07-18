@@ -22,18 +22,23 @@ export default function KnowledgeBase() {
 
   async function fetchFiles() {
     const { data, error } = await supabase
-      .from('knowledge_base_entries')
-      .select('*')
-      .order('uploaded_at', { ascending: false })
-    if (!error && data) {
-      for (const entry of data) {
-        const { data: urlData } = await supabase.storage
-          .from('knowledge_base')
-          .createSignedUrl(entry.file_url, 60)
-        entry.url = urlData?.signedUrl
-      }
-      setFiles(data)
+      .storage
+      .from('knowledge_base')
+      .list('uploads')
+
+    if (error) {
+      console.error('List error:', error)
+      return
     }
+
+    const items = data.map((f) => {
+      const { data: urlData } = supabase.storage
+        .from('knowledge_base')
+        .getPublicUrl(`uploads/${f.name}`)
+      return { file_name: f.name, file_url: `uploads/${f.name}`, url: urlData.publicUrl }
+    })
+
+    setFiles(items)
   }
 
   async function handleUpload(e) {
@@ -59,7 +64,10 @@ export default function KnowledgeBase() {
 
   async function handleDelete(entry) {
     await supabase.storage.from('knowledge_base').remove([entry.file_url])
-    await supabase.from('knowledge_base_entries').delete().eq('id', entry.id)
+    await supabase
+      .from('knowledge_base_entries')
+      .delete()
+      .eq('file_url', entry.file_url)
     await fetchFiles()
   }
 
@@ -92,7 +100,7 @@ export default function KnowledgeBase() {
       {message && <p>{message}</p>}
       <ul>
         {files?.map((entry) => (
-          <li key={entry.id} style={{ marginBottom: 10 }}>
+          <li key={entry.file_url} style={{ marginBottom: 10 }}>
             <a
               href={entry.url}
               target="_blank"
