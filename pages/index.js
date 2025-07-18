@@ -1,65 +1,94 @@
-import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-const dummyData = [
-  { month: 'Jan', UK: 12, US: 9, Total: 21 },
-  { month: 'Feb', UK: 14, US: 10, Total: 24 },
-  { month: 'Mar', UK: 13, US: 12, Total: 25 },
-  { month: 'Apr', UK: 15, US: 11, Total: 26 },
-];
+import { useState } from 'react'
 
 export default function Home() {
-  const [showRegions, setShowRegions] = useState(false);
-  const [query, setQuery] = useState('');
-  const [response, setResponse] = useState('');
+  const [askInput, setAskInput] = useState('')
+  const [askResponse, setAskResponse] = useState('')
+  const [loadingAsk, setLoadingAsk] = useState(false)
 
-  const handleQuery = async () => {
+  const [draftInput, setDraftInput] = useState('')
+  const [draftResponse, setDraftResponse] = useState('')
+  const [loadingDraft, setLoadingDraft] = useState(false)
+  const [tone, setTone] = useState('general')
+
+  const handleAsk = async () => {
+    if (!askInput) return
+    setLoadingAsk(true)
     const res = await fetch('/api/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
-    });
-    const data = await res.json();
-    setResponse(data.result);
-  };
+      body: JSON.stringify({ query: askInput })
+    })
+    const data = await res.json()
+    setAskResponse(data.result)
+    setLoadingAsk(false)
+  }
+
+  const handleDraft = async () => {
+    if (!draftInput) return
+    setLoadingDraft(true)
+    const res = await fetch('/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: draftInput, email: true, tone })
+    })
+    const data = await res.json()
+    setDraftResponse(data.result)
+    setLoadingDraft(false)
+  }
 
   return (
-    <div style={{ padding: 20, background: '#0a0a0a', color: '#fff', fontFamily: 'Arial' }}>
-      <h1 style={{ color: '#5ec2f7' }}>The Reward Collection - Retailer Dashboard</h1>
+    <div style={{ padding: 20 }}>
+      <h2 style={{ color: '#5ec2f7' }}>Ask TRC</h2>
       <div style={{ marginBottom: 20 }}>
         <input
           type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask a question (e.g. How many US retailers are live?)"
-          style={{ padding: 10, width: '60%' }}
+          value={askInput}
+          onChange={(e) => setAskInput(e.target.value)}
+          placeholder="Ask a question"
+          style={{ padding: 10, width: '100%' }}
         />
-        <button onClick={handleQuery} style={{ marginLeft: 10, padding: '10px 20px' }}>Ask AI</button>
+        <div style={{ marginTop: 10 }}>
+          <button onClick={handleAsk} style={{ padding: '10px 20px' }}>Submit</button>
+        </div>
       </div>
-      {response && (
+      {loadingAsk && <p>Thinking...</p>}
+      {askResponse && (
         <div style={{ marginBottom: 20, backgroundColor: '#1a1a1a', padding: 10 }}>
-          <strong>AI Response:</strong> {response}
+          <pre style={{ whiteSpace: 'pre-wrap' }}>{askResponse}</pre>
         </div>
       )}
-      <label>
-        <input type="checkbox" checked={showRegions} onChange={() => setShowRegions(!showRegions)} />
-        Show region breakdown
-      </label>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={dummyData}>
-          <XAxis dataKey="month" stroke="#ccc" />
-          <YAxis stroke="#ccc" />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="Total" stroke="#5ec2f7" />
-          {showRegions && (
-            <>
-              <Line type="monotone" dataKey="UK" stroke="#a6e3e9" />
-              <Line type="monotone" dataKey="US" stroke="#f9a826" />
-            </>
-          )}
-        </LineChart>
-      </ResponsiveContainer>
+
+      <h2>Draft Reply</h2>
+      <div style={{ marginBottom: 20 }}>
+        <textarea
+          value={draftInput}
+          onChange={(e) => setDraftInput(e.target.value)}
+          placeholder="Paste an email or prompt"
+          rows={10}
+          style={{ padding: 10, width: '100%' }}
+        />
+        <div style={{ marginTop: 10, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button onClick={handleDraft} style={{ padding: '10px 20px' }}>Generate</button>
+          <label style={{ color: '#5ec2f7' }}>
+            Tone Enhancer:
+            <select value={tone} onChange={(e) => setTone(e.target.value)} style={{ marginLeft: '0.5rem' }}>
+              <option value="general">General</option>
+              <option value="sales">Sales</option>
+              <option value="account manager">Account Manager</option>
+              <option value="credit control">Credit Control</option>
+              <option value="legal">Legal</option>
+              <option value="exec team">Exec Team</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      {loadingDraft && <p>Thinking...</p>}
+      {draftResponse && (
+        <div style={{ marginBottom: 20, backgroundColor: '#1a1a1a', padding: 10 }}>
+          <strong>Email Response:</strong>
+          <pre style={{ whiteSpace: 'pre-wrap' }}>{draftResponse}</pre>
+        </div>
+      )}
     </div>
-  );
+  )
 }
