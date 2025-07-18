@@ -35,7 +35,7 @@ This project provides an interface for the Reward Collection tools. Files for th
    supabase functions invoke extract-text-from-upload
    ```
    Ensure the following environment variables are provided when deploying:
-   `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+   `PROJECT_URL` and `SERVICE_ROLE_KEY`.
 
 8. Install dependencies and run the development server:
    ```
