@@ -74,7 +74,7 @@ export default async function handler(req, res) {
   console.log('Received query:', query)
 
   try {
-    let systemMessage = 'You are a helpful assistant. Only answer using the provided context. If the information is not in the context, respond with "This information is not available in our records."'
+    let systemMessage = 'You are a helpful assistant. Use the merchants, publishers, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
     let supabaseContext = ''
 
     const tableMap = {
@@ -219,12 +219,21 @@ export default async function handler(req, res) {
         supabase.from('Publishers').select('*')
       ])
 
-      const { data: kb } = await supabase
+      let { data: kb } = await supabase
         .from('knowledge_base_entries')
         .select('*')
         .textSearch('extracted_text', query, { type: 'websearch' })
         .order('uploaded_at', { ascending: false })
         .limit(5)
+
+      if (!kb || kb.length === 0) {
+        const fallback = await supabase
+          .from('knowledge_base_entries')
+          .select('*')
+          .order('uploaded_at', { ascending: false })
+          .limit(5)
+        kb = fallback.data || []
+      }
 
       if (kb?.length) {
         const kbSummary = kb
@@ -245,9 +254,9 @@ export default async function handler(req, res) {
     }
 
     if (email) {
-      systemMessage = 'You are a helpful assistant that writes concise professional email replies in a proper email format including a greeting and closing. Only answer using the provided context. If the information is not in the context, respond with "This information is not available in our records."'
-      if (tone && tone !== 'general') {
-        switch (tone) {
+      systemMessage = 'You are a helpful assistant that writes concise professional email replies in a proper email format including a greeting and closing. Use the merchants, publishers, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
+      if (tone && tone.toLowerCase() !== 'general') {
+        switch (tone.toLowerCase()) {
           case 'sales':
             systemMessage += ' Respond in the persuasive style of a sales professional.'
             break

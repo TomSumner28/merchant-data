@@ -189,30 +189,32 @@ export default function Dashboard() {
           </ResponsiveContainer>
 
           <h3>Reach Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={reachData}
-                dataKey="reach"
-                nameKey="publisher"
-                outerRadius={100}
-                label={({ name }) => name}
-              >
-                {reachData.map((entry, index) => (
-                  <Cell key={`cell-pie-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(v) => v.toLocaleString()} />
-            </PieChart>
-          </ResponsiveContainer>
-
-          <ul>
-            {reachData.map((d) => (
-              <li key={d.publisher}>
-                {d.publisher}: {d.reach.toLocaleString()} ({((d.reach / totalReach) * 100).toFixed(1)}%)
-              </li>
-            ))}
-          </ul>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ flex: 1 }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={reachData}
+                    dataKey="reach"
+                    nameKey="publisher"
+                    outerRadius={100}
+                  >
+                    {reachData.map((entry, index) => (
+                      <Cell key={`cell-pie-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => v.toLocaleString()} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {reachData.map((d) => (
+                <li key={d.publisher}>
+                  {d.publisher}: {d.reach.toLocaleString()} ({((d.reach / totalReach) * 100).toFixed(1)}%)
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <h3>New Customer Offers</h3>
           <ResponsiveContainer width="100%" height={300}>
