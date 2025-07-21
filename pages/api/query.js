@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { query, email, short, tone } = req.body
+  const { query, email, short, tone, history = [] } = req.body
 
   try {
     let systemMessage = 'You are a helpful assistant.'
@@ -22,8 +22,8 @@ export default async function handler(req, res) {
       retailers: 'Merchants',
       merchant: 'Merchants',
       merchants: 'Merchants',
-      partner: 'Merchants',
-      partners: 'Merchants',
+      partner: 'Publishers',
+      partners: 'Publishers',
       publisher: 'Publishers',
       publishers: 'Publishers'
     }
@@ -124,7 +124,8 @@ export default async function handler(req, res) {
         }
       }
 
-      const needKb = /clause|contract|policy|procedure|process/i.test(query)
+      const kbRegex = /clause|contract|policy|procedure|process|onboarding|faq|the reward collection|\btrc\b|website|sales deck/i
+      const needKb = kbRegex.test(query)
       if (needKb) {
         const { data: kb } = await supabase
           .from('knowledge_base_entries')
@@ -169,6 +170,9 @@ export default async function handler(req, res) {
     ]
     if (supabaseContext) {
       messages.push({ role: 'system', content: supabaseContext.slice(0, 4000) })
+    }
+    for (const m of history) {
+      if (m.role && m.content) messages.push(m)
     }
     messages.push({ role: 'user', content: query })
 

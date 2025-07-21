@@ -1,6 +1,6 @@
 # TRC AI Front End
 
-This project provides an interface for the Reward Collection tools. Files for the Knowledge Base are stored in Supabase Storage and used to enrich GPT replies on the home page.
+This project provides an interface for the Reward Collection tools. Files for the Knowledge Base are stored in Supabase Storage and used to enrich GPT replies on the home page. The homepage offers a multi-turn chat interface so you can hold a conversation with TRC's GPT assistant and a Draft Reply tool for email responses.
 
 ## Supabase Setup
 
@@ -53,9 +53,7 @@ queries Supabase in real time to return accurate numbers. For contractual or
 policy questions it searches the `knowledge_base_entries.extracted_text` column
 and includes the most relevant passages.
 
-The home page includes a Draft Reply tool that can generate email responses. Use
-the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,
-Account Manager or Legal.
+The home page includes a persistent Ask TRC chat where each question and answer is stored in a conversation history that you can collapse or reset. Below the chat is the Draft Reply tool which generates email responses. Use the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales, Account Manager or Legal.
 
 ## Semantic Queries
 
@@ -69,6 +67,8 @@ maps common synonyms to the actual database columns. For example:
 This mapping allows natural language questions to be converted into live Supabase
 queries so counts and lists stay accurate even if your wording doesn’t match the
 database schema exactly.
+
+Questions mentioning partners or publishers are resolved against the **Publishers** table. Anything about The Reward Collection in general—FAQs, onboarding steps, contracts, or website text—is searched in the `knowledge_base_entries.extracted_text` column.
 
 ## Testing Page
 
