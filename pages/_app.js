@@ -13,7 +13,15 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', background: darkMode ? '#333' : '#eee' }}>
+      <nav style={{
+        display: 'flex',
+        gap: '1rem',
+        padding: '1rem',
+        background: darkMode ? '#333' : '#eee',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000
+      }}>
         <Link href="/" style={{ color: linkColor }}>Home</Link>
         <a href="https://forecasting.therewardcollection.com" target="_blank" rel="noopener noreferrer" style={{ color: linkColor }}>Forecasting</a>
         <Link href="/asset-creation" style={{ color: linkColor }}>Asset Creation</Link>
