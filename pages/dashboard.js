@@ -196,7 +196,7 @@ export default function Dashboard() {
                 dataKey="reach"
                 nameKey="publisher"
                 outerRadius={100}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`}
+                label={({ name }) => name}
               >
                 {reachData.map((entry, index) => (
                   <Cell key={`cell-pie-${index}`} fill={COLORS[index % COLORS.length]} />
