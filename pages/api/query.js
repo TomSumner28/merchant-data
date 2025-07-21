@@ -22,9 +22,8 @@ export default async function handler(req, res) {
         supabase.from('Publishers').select('*').limit(50),
         supabase
           .from('knowledge_base_entries')
-          .select('extracted_text')
+          .select('*')
           .order('uploaded_at', { ascending: false })
-          .limit(5),
       ])
 
       if (merchants.data) {

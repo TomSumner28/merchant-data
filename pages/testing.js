@@ -20,7 +20,6 @@ export default function Testing() {
           .from('knowledge_base_entries')
           .select('*')
           .order('uploaded_at', { ascending: false })
-          .limit(5)
       ])
       if (merchantsRes.error || publishersRes.error || entriesRes.error) {
         console.error(merchantsRes.error || publishersRes.error || entriesRes.error)

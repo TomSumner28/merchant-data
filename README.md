@@ -45,9 +45,9 @@ This project provides an interface for the Reward Collection tools. Files for th
    ```
 
 Uploaded files in the `knowledge_base` bucket are parsed automatically and saved
-to the `knowledge_base_entries` table. The home page GPT tools use the latest
-entries, plus data from the `Merchants` and `Publishers` tables, to provide
-richer answers.
+to the `knowledge_base_entries` table. The home page GPT tools load all entries
+from this table, along with data from the `Merchants` and `Publishers` tables,
+to provide richer answers.
 
 The home page includes a Draft Reply tool that can generate email responses. Use
 the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,
@@ -55,4 +55,7 @@ Account Manager or Legal.
 
 ## Testing Page
 
-Visit `/testing` to see the exact data loaded from Supabase and passed to GPT. The page lists the first 50 Merchants, first 50 Publishers, and the five most recent knowledge base entries. Use this page to verify that GPT has access to the expected records.
+Visit `/testing` to see the exact data loaded from Supabase and passed to GPT.
+The page lists the first 50 Merchants, first 50 Publishers, and every knowledge
+base entry in your project. Use this page to verify that GPT has access to the
+expected records.
