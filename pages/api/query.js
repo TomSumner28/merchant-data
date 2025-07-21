@@ -219,27 +219,28 @@ export default async function handler(req, res) {
         supabase.from('Publishers').select('*')
       ])
 
-      if (merchants.data?.length) {
-        const merchantSummary = JSON.stringify(merchants.data)
-        supabaseContext += `Merchants data: ${merchantSummary.slice(0, 4000)}\n`
-      }
-
-      if (publishers.data?.length) {
-        const publisherSummary = JSON.stringify(publishers.data)
-        supabaseContext += `Publishers data: ${publisherSummary.slice(0, 4000)}\n`
-      }
-
       const { data: kb } = await supabase
         .from('knowledge_base_entries')
         .select('*')
         .textSearch('extracted_text', query, { type: 'websearch' })
         .order('uploaded_at', { ascending: false })
         .limit(5)
+
       if (kb?.length) {
         const kbSummary = kb
           .map((d) => `${d.file_name} (${d.file_type}): ${d.extracted_text}`)
           .join('\n')
-        supabaseContext += kbSummary.slice(0, 4000)
+        supabaseContext += `Knowledge base:\n${kbSummary.slice(0, 1000)}\n`
+      }
+
+      if (merchants.data?.length) {
+        const merchantSummary = JSON.stringify(merchants.data)
+        supabaseContext += `Merchants data: ${merchantSummary.slice(0, 1500)}\n`
+      }
+
+      if (publishers.data?.length) {
+        const publisherSummary = JSON.stringify(publishers.data)
+        supabaseContext += `Publishers data: ${publisherSummary.slice(0, 1500)}\n`
       }
     }
 
