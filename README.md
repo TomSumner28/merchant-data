@@ -52,3 +52,7 @@ richer answers.
 The home page includes a Draft Reply tool that can generate email responses. Use
 the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,
 Account Manager or Legal.
+
+## Testing Page
+
+Visit `/testing` to see the exact data loaded from Supabase and passed to GPT. The page lists the first 50 Merchants, first 50 Publishers, and the five most recent knowledge base entries. Use this page to verify that GPT has access to the expected records.
