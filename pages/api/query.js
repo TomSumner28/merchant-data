@@ -55,8 +55,10 @@ export default async function handler(req, res) {
 
   const { query, email, short, tone, history = [] } = req.body
 
+  console.log('Received query:', query)
+
   try {
-    let systemMessage = 'You are a helpful assistant.'
+    let systemMessage = 'You are a helpful assistant. Only answer using the provided context. If the information is not in the context, respond with "This information is not available in our records."'
     let supabaseContext = ''
 
     const tableMap = {
@@ -129,70 +131,62 @@ export default async function handler(req, res) {
       if (clauseMatch) {
         const clauseNum = clauseMatch[1]
         const clauseText = await fetchClauseText(clauseNum)
+        console.log('Clause lookup:', clauseText ? 'found' : 'not found')
         if (clauseText) {
-          supabaseContext += `Clause ${clauseNum}: ${clauseText}\n`
-        } else {
-          supabaseContext += `Clause ${clauseNum} not found.\n`
+          return res.status(200).json({ result: `Clause ${clauseNum}: ${clauseText}` })
         }
+        return res.status(200).json({ result: `Clause ${clauseNum} is not present in our current contract.` })
       }
+
       if (intent.table && intent.action === 'count') {
         let qb = supabase.from(intent.table).select('*', { count: 'exact', head: true })
         if (intent.status) qb = qb.eq('status', intent.status)
         if (intent.region) qb = qb.ilike('region', `%${intent.region}%`)
-        const { count = 0 } = await qb
-        supabaseContext += `There are ${count} ${intent.status ? intent.status + ' ' : ''}${intent.table.toLowerCase()}${intent.region ? ` in ${intent.region}` : ''}.\n`
-      } else if (intent.table && intent.action === 'list') {
+        const { count = 0, error } = await qb
+        console.log('Count query', { table: intent.table, count, error })
+        if (!count) {
+          return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
+        }
+        return res.status(200).json({ result: `There are ${count} ${intent.status ? intent.status + ' ' : ''}${intent.table.toLowerCase()}${intent.region ? ` in ${intent.region}` : ''}.` })
+      }
+
+      if (intent.table && intent.action === 'list') {
         let qb = supabase.from(intent.table).select('name')
         if (intent.status) qb = qb.eq('status', intent.status)
         if (intent.region) qb = qb.ilike('region', `%${intent.region}%`)
-        const { data } = await qb
-        if (data?.length) {
-          const names = data.map((d) => d.name).filter(Boolean)
-          supabaseContext += `${intent.table} names: ${names.join(', ')}.\n`
+        const { data, error } = await qb
+        console.log('List query', { table: intent.table, found: data?.length, error })
+        if (!data?.length) {
+          return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
         }
-      } else {
-        const [merchants, merchantCountRes, publishers, publisherCountRes] = await Promise.all([
-          supabase.from('Merchants').select('name'),
-          supabase.from('Merchants').select('*', { count: 'exact', head: true }),
-          supabase.from('Publishers').select('name'),
-          supabase.from('Publishers').select('*', { count: 'exact', head: true })
-        ])
-
-        const merchantCount = merchantCountRes.count || 0
-        const publisherCount = publisherCountRes.count || 0
-        systemMessage += ` There are currently ${merchantCount} merchants and ${publisherCount} publishers in the database.`
-
-        if (merchants.data?.length) {
-          const names = merchants.data.map((m) => m.name).filter(Boolean).slice(0, 50)
-          if (names.length) {
-            supabaseContext += `Merchant names: ${names.join(', ')}.\n`
-          }
-        }
-        if (publishers.data?.length) {
-          const names = publishers.data.map((p) => p.name).filter(Boolean).slice(0, 50)
-          if (names.length) {
-            supabaseContext += `Publisher names: ${names.join(', ')}.\n`
-          }
-        }
+        const names = data.map((d) => d.name).filter(Boolean)
+        return res.status(200).json({ result: names.join(', ') })
       }
 
-      const kbRegex = /clause|contract|policy|procedure|process|onboarding|faq|the reward collection|\btrc\b|website|sales deck/i
-      const needKb = kbRegex.test(query)
-      if (needKb) {
-        const { data: kb } = await supabase
-          .from('knowledge_base_entries')
-          .select('extracted_text')
-          .textSearch('extracted_text', query, { type: 'websearch' })
-          .order('uploaded_at', { ascending: false })
-          .limit(5)
-        if (kb?.length) {
-          supabaseContext += kb.map((d) => d.extracted_text).join('\n').slice(0, 4000)
-        }
+      const [merchants, publishers] = await Promise.all([
+        supabase.from('Merchants').select('name'),
+        supabase.from('Publishers').select('name')
+      ])
+
+      const merchantNames = merchants.data?.map((m) => m.name).filter(Boolean).join(', ') || ''
+      const publisherNames = publishers.data?.map((p) => p.name).filter(Boolean).join(', ') || ''
+
+      supabaseContext += merchantNames ? `Merchant names: ${merchantNames}.\n` : ''
+      supabaseContext += publisherNames ? `Publisher names: ${publisherNames}.\n` : ''
+
+      const { data: kb } = await supabase
+        .from('knowledge_base_entries')
+        .select('extracted_text')
+        .textSearch('extracted_text', query, { type: 'websearch' })
+        .order('uploaded_at', { ascending: false })
+        .limit(5)
+      if (kb?.length) {
+        supabaseContext += kb.map((d) => d.extracted_text).join('\n').slice(0, 4000)
       }
     }
 
     if (email) {
-      systemMessage = 'You are a helpful assistant that replies in a professional email format.'
+      systemMessage = 'You are a helpful assistant that replies in a professional email format. Only answer using the provided context. If the information is not in the context, respond with "This information is not available in our records."'
       if (tone && tone !== 'general') {
         switch (tone) {
           case 'sales':

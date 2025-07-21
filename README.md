@@ -70,6 +70,10 @@ database schema exactly.
 
 Questions mentioning partners or publishers are resolved against the **Publishers** table. Anything about The Reward Collection in general—FAQs, onboarding steps, contracts, or website text—is searched in the `knowledge_base_entries.extracted_text` column.
 
+### Strict data grounding
+
+Ask TRC will only reference merchants, publishers and contract clauses that actually exist in Supabase (or on the official contract page). If a requested item is missing, the reply will state that the information isn’t in our records rather than guessing.
+
 ## Testing Page
 
 Visit `/testing` to see the exact data loaded from Supabase and passed to GPT.
