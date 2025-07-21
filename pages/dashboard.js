@@ -40,16 +40,16 @@ export default function Dashboard() {
   let cashbackNum = 0
 
   merchants.forEach((m) => {
-    const region = m.region || 'Unknown'
+    const region = m["Countries"] || 'Unknown'
     regionCounts[region] = (regionCounts[region] || 0) + 1
 
-    const method = m.payment_method || 'Unknown'
+    const method = m["Billing Type"] || 'Unknown'
     paymentCounts[method] = (paymentCounts[method] || 0) + 1
 
-    const status = m.status || 'Unknown'
+    const status = m["Deal Stage"] || 'Unknown'
     statusCounts[status] = (statusCounts[status] || 0) + 1
 
-    const cb = parseFloat(m.cashback)
+    const cb = parseFloat(m["New Cashback"]) 
     if (!isNaN(cb)) {
       cashbackSum += cb
       cashbackNum += 1

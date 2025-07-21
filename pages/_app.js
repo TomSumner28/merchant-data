@@ -28,7 +28,6 @@ function MyApp({ Component, pageProps }) {
         <Link href="/external-tools" style={{ color: linkColor }}>External Tools</Link>
         <Link href="/time-zone-tracker" style={{ color: linkColor }}>Time Zone Tracker</Link>
         <Link href="/dashboard" style={{ color: linkColor }}>Dashboard</Link>
-        <Link href="/testing" style={{ color: linkColor }}>Testing</Link>
         <div style={{ marginLeft: 'auto' }}>
           <button onClick={() => setDarkMode(!darkMode)}>
             {darkMode ? 'Light Mode' : 'Dark Mode'}

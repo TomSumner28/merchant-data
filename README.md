@@ -74,10 +74,3 @@ Questions mentioning partners or publishers are resolved against the **Publisher
 
 Ask TRC will only reference merchants, publishers and contract clauses that actually exist in Supabase (or on the official contract page). If a requested item is missing, the reply will state that the information isn’t in our records rather than guessing.
 
-## Testing Page
-
-Visit `/testing` to see the exact data loaded from Supabase and passed to GPT.
-The page lists **all** Merchants, **all** Publishers and every knowledge base
-entry in your project. Use this page to verify that GPT has access to the full
-dataset. If you have thousands of rows consider adding pagination or filtering
-when browsing this page.

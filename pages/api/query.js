@@ -140,8 +140,8 @@ export default async function handler(req, res) {
 
       if (intent.table && intent.action === 'count') {
         let qb = supabase.from(intent.table).select('*', { count: 'exact', head: true })
-        if (intent.status) qb = qb.eq('status', intent.status)
-        if (intent.region) qb = qb.ilike('region', `%${intent.region}%`)
+        if (intent.status) qb = qb.eq('"Deal Stage"', intent.status)
+        if (intent.region) qb = qb.ilike('"Countries"', `%${intent.region}%`)
         const { count = 0, error } = await qb
         console.log('Count query', { table: intent.table, count, error })
         if (!count) {
@@ -151,24 +151,24 @@ export default async function handler(req, res) {
       }
 
       if (intent.table && intent.action === 'list') {
-        let qb = supabase.from(intent.table).select('name')
-        if (intent.status) qb = qb.eq('status', intent.status)
-        if (intent.region) qb = qb.ilike('region', `%${intent.region}%`)
+        let qb = supabase.from(intent.table).select('"Merchant"')
+        if (intent.status) qb = qb.eq('"Deal Stage"', intent.status)
+        if (intent.region) qb = qb.ilike('"Countries"', `%${intent.region}%`)
         const { data, error } = await qb
         console.log('List query', { table: intent.table, found: data?.length, error })
         if (!data?.length) {
           return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
         }
-        const names = data.map((d) => d.name).filter(Boolean)
+        const names = data.map((d) => d["Merchant"]).filter(Boolean)
         return res.status(200).json({ result: names.join(', ') })
       }
 
       const [merchants, publishers] = await Promise.all([
-        supabase.from('Merchants').select('name'),
+        supabase.from('Merchants').select('"Merchant"'),
         supabase.from('Publishers').select('name')
       ])
 
-      const merchantNames = merchants.data?.map((m) => m.name).filter(Boolean).join(', ') || ''
+      const merchantNames = merchants.data?.map((m) => m["Merchant"]).filter(Boolean).join(', ') || ''
       const publisherNames = publishers.data?.map((p) => p.name).filter(Boolean).join(', ') || ''
 
       supabaseContext += merchantNames ? `Merchant names: ${merchantNames}.\n` : ''
