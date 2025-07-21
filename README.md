@@ -54,6 +54,7 @@ policy questions it searches the `knowledge_base_entries` table and includes the
 most relevant passages along with file details like name, URL and type.
 
 The home page includes a persistent Ask TRC chat where each question and answer is stored in a conversation history (saved to `localStorage`) that you can collapse or reset. Below the chat is the Draft Reply tool which generates email responses. Use the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales, Account Manager or Legal.
+The Draft Reply feature pulls the same Supabase context as Ask TRC so email answers can cite merchant records or contract clauses when relevant.
 
 ## Semantic Queries
 

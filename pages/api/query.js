@@ -151,10 +151,18 @@ export default async function handler(req, res) {
         const clauseNum = clauseMatch[1]
         const clauseText = await fetchClauseText(clauseNum)
         console.log('Clause lookup:', clauseText ? 'found' : 'not found')
-        if (clauseText) {
-          return res.status(200).json({ result: `Clause ${clauseNum}: ${clauseText}` })
+        if (email) {
+          if (clauseText) {
+            supabaseContext += `Clause ${clauseNum}: ${clauseText}`
+          } else {
+            supabaseContext += `Clause ${clauseNum} is not present in our current contract.`
+          }
+        } else {
+          if (clauseText) {
+            return res.status(200).json({ result: `Clause ${clauseNum}: ${clauseText}` })
+          }
+          return res.status(200).json({ result: `Clause ${clauseNum} is not present in our current contract.` })
         }
-        return res.status(200).json({ result: `Clause ${clauseNum} is not present in our current contract.` })
       }
 
       if (intent.table && intent.action === 'count') {
@@ -175,7 +183,11 @@ export default async function handler(req, res) {
         if (!count) {
           return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
         }
-        return res.status(200).json({ result: `There are ${count} ${intent.status ? intent.status + ' ' : ''}${intent.table.toLowerCase()}${intent.region ? ` in ${intent.region}` : ''}.` })
+        if (email) {
+          supabaseContext += `There are ${count} ${intent.status ? intent.status + ' ' : ''}${intent.table.toLowerCase()}${intent.region ? ` in ${intent.region}` : ''}.\n`
+        } else {
+          return res.status(200).json({ result: `There are ${count} ${intent.status ? intent.status + ' ' : ''}${intent.table.toLowerCase()}${intent.region ? ` in ${intent.region}` : ''}.` })
+        }
       }
 
       if (intent.table && intent.action === 'list') {
@@ -195,7 +207,11 @@ export default async function handler(req, res) {
         if (!names.length) {
           return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
         }
-        return res.status(200).json({ result: names.join(', ') })
+        if (email) {
+          supabaseContext += names.join(', ') + '\n'
+        } else {
+          return res.status(200).json({ result: names.join(', ') })
+        }
       }
 
       const [merchants, publishers] = await Promise.all([
