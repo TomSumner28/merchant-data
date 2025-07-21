@@ -57,6 +57,19 @@ The home page includes a Draft Reply tool that can generate email responses. Use
 the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,
 Account Manager or Legal.
 
+## Semantic Queries
+
+When you ask questions like "How many retailers are active in the United States?" the API
+maps common synonyms to the actual database columns. For example:
+
+- *retailer* → **Merchants** table
+- *active* or *enabled* → `status = 'live'`
+- *in the USA* → `region = 'USA'`
+
+This mapping allows natural language questions to be converted into live Supabase
+queries so counts and lists stay accurate even if your wording doesn’t match the
+database schema exactly.
+
 ## Testing Page
 
 Visit `/testing` to see the exact data loaded from Supabase and passed to GPT.

@@ -17,21 +17,72 @@ export default async function handler(req, res) {
     let systemMessage = 'You are a helpful assistant.'
     let supabaseContext = ''
 
+    const tableMap = {
+      retailer: 'Merchants',
+      retailers: 'Merchants',
+      merchant: 'Merchants',
+      merchants: 'Merchants',
+      partner: 'Merchants',
+      partners: 'Merchants',
+      publisher: 'Publishers',
+      publishers: 'Publishers'
+    }
+
+    const statusMap = {
+      live: 'live',
+      active: 'live',
+      enabled: 'live'
+    }
+
+    const regionMap = {
+      usa: 'USA',
+      'united states': 'USA',
+      us: 'USA',
+      canada: 'Canada',
+      uk: 'UK',
+      'united kingdom': 'UK'
+    }
+
     const parseIntent = (text) => {
       const lower = text.toLowerCase()
       const info = {}
-      if (/merchant|retailer/.test(lower)) info.table = 'Merchants'
-      if (/publisher/.test(lower)) info.table = info.table || 'Publishers'
-      if (/how many|count/.test(lower)) info.action = 'count'
-      if (/list/.test(lower)) info.action = 'list'
-      if (/live/.test(lower)) info.status = 'live'
+
+      for (const [syn, table] of Object.entries(tableMap)) {
+        if (lower.includes(syn)) {
+          info.table = table
+          break
+        }
+      }
+
+      if (/how many|count|number of/.test(lower)) info.action = 'count'
+      if (/\blist\b|which|show/.test(lower)) info.action = info.action || 'list'
+
+      for (const [syn, status] of Object.entries(statusMap)) {
+        if (lower.includes(syn)) {
+          info.status = status
+          break
+        }
+      }
+
+      for (const [syn, region] of Object.entries(regionMap)) {
+        if (lower.includes(syn)) {
+          info.region = region
+          break
+        }
+      }
+
       const regionMatch = lower.match(/in(?: the)? ([a-z ]+)/)
-      if (regionMatch) info.region = regionMatch[1].trim()
+      if (regionMatch && !info.region) {
+        const region = regionMatch[1].trim()
+        info.region = regionMap[region] || region
+      }
+
       return info
     }
 
     if (supabase) {
       const intent = parseIntent(query)
+      console.log('Parsed intent:', intent)
       if (intent.table && intent.action === 'count') {
         let qb = supabase.from(intent.table).select('*', { count: 'exact', head: true })
         if (intent.status) qb = qb.eq('status', intent.status)
