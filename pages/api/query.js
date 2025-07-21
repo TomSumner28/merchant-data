@@ -164,15 +164,19 @@ export default async function handler(req, res) {
       }
 
       const [merchants, publishers] = await Promise.all([
-        supabase.from('Merchants').select('"Merchant"'),
-        supabase.from('Publishers').select('name')
+        supabase.from('Merchants').select('*'),
+        supabase.from('Publishers').select('*')
       ])
 
-      const merchantNames = merchants.data?.map((m) => m["Merchant"]).filter(Boolean).join(', ') || ''
-      const publisherNames = publishers.data?.map((p) => p.name).filter(Boolean).join(', ') || ''
+      if (merchants.data?.length) {
+        const merchantSummary = JSON.stringify(merchants.data)
+        supabaseContext += `Merchants data: ${merchantSummary.slice(0, 4000)}\n`
+      }
 
-      supabaseContext += merchantNames ? `Merchant names: ${merchantNames}.\n` : ''
-      supabaseContext += publisherNames ? `Publisher names: ${publisherNames}.\n` : ''
+      if (publishers.data?.length) {
+        const publisherSummary = JSON.stringify(publishers.data)
+        supabaseContext += `Publishers data: ${publisherSummary.slice(0, 4000)}\n`
+      }
 
       const { data: kb } = await supabase
         .from('knowledge_base_entries')
