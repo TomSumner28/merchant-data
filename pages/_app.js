@@ -16,7 +16,6 @@ function MyApp({ Component, pageProps }) {
       <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', background: darkMode ? '#333' : '#eee' }}>
         <Link href="/" style={{ color: linkColor }}>Home</Link>
         <a href="https://forecasting.therewardcollection.com" target="_blank" rel="noopener noreferrer" style={{ color: linkColor }}>Forecasting</a>
-        <Link href="/knowledge-base" style={{ color: linkColor }}>Knowledge Base</Link>
         <Link href="/asset-creation" style={{ color: linkColor }}>Asset Creation</Link>
         <Link href="/external-tools" style={{ color: linkColor }}>External Tools</Link>
         <Link href="/time-zone-tracker" style={{ color: linkColor }}>Time Zone Tracker</Link>

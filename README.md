@@ -1,14 +1,13 @@
 # TRC AI Front End
 
-This project provides an interface for the Reward Collection tools. Files for the Knowledge Base are stored in Supabase Storage.
+This project provides an interface for the Reward Collection tools. Files for the Knowledge Base are stored in Supabase Storage and used to enrich GPT replies on the home page.
 
 ## Supabase Setup
 
 1. [Create a Supabase project](https://supabase.com/).
 2. In your project, create a bucket named `knowledge_base` and make it
    **public**. Upload your documents directly into this bucket using the
-   Supabase dashboard or API. The Knowledge Base page automatically fetches the
-   current file list from Supabase.
+   Supabase dashboard or API. Files are used to enrich GPT replies.
 3. Copy your project URL and anon key from the Supabase dashboard.
 4. Create a `.env.local` file in this repo and set:
    ```
@@ -45,10 +44,11 @@ This project provides an interface for the Reward Collection tools. Files for th
    npm run dev
    ```
 
-The Knowledge Base page lists the files stored in your `knowledge_base` bucket
-by calling an API route that retrieves file names from Supabase. Add new files
-directly in Supabase; once uploaded they appear automatically on the site.
-Use the **Sync with Backend** button on that page to parse any newly uploaded
-files and store their contents in the `knowledge_base_entries` table.
+Uploaded files in the `knowledge_base` bucket are parsed automatically and saved
+to the `knowledge_base_entries` table. The home page GPT tools use the latest
+entries, plus data from the `Merchants` and `Publishers` tables, to provide
+richer answers.
 
-The home page includes a Draft Reply tool that can generate email responses. Use the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales, Account Manager or Legal.
+The home page includes a Draft Reply tool that can generate email responses. Use
+the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,
+Account Manager or Legal.

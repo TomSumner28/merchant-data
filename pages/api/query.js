@@ -15,7 +15,29 @@ export default async function handler(req, res) {
 
   try {
     let systemMessage = 'You are a helpful assistant.'
-    let kbContext = ''
+    let supabaseContext = ''
+    if (supabase) {
+      const [merchants, publishers, kb] = await Promise.all([
+        supabase.from('Merchants').select('*').limit(50),
+        supabase.from('Publishers').select('*').limit(50),
+        supabase
+          .from('knowledge_base_entries')
+          .select('extracted_text')
+          .order('uploaded_at', { ascending: false })
+          .limit(5),
+      ])
+
+      if (merchants.data) {
+        supabaseContext += JSON.stringify(merchants.data) + '\n'
+      }
+      if (publishers.data) {
+        supabaseContext += JSON.stringify(publishers.data) + '\n'
+      }
+      if (kb.data) {
+        supabaseContext += kb.data.map((d) => d.extracted_text).join('\n')
+      }
+    }
+
     if (email) {
       systemMessage = 'You are a helpful assistant that replies in a professional email format.'
       if (tone && tone !== 'general') {
@@ -39,24 +61,14 @@ export default async function handler(req, res) {
             break
         }
       }
-      if (supabase) {
-        const { data } = await supabase
-          .from('knowledge_base_entries')
-          .select('extracted_text')
-          .order('uploaded_at', { ascending: false })
-          .limit(5)
-        if (data) {
-          kbContext = data.map((d) => d.extracted_text).join('\n')
-        }
-      }
     } else if (short) {
       systemMessage = 'You answer timezone questions with only the converted time in HH:mm format without extra commentary.'
     }
     const messages = [
       { role: 'system', content: systemMessage },
     ]
-    if (kbContext) {
-      messages.push({ role: 'system', content: kbContext.slice(0, 4000) })
+    if (supabaseContext) {
+      messages.push({ role: 'system', content: supabaseContext.slice(0, 4000) })
     }
     messages.push({ role: 'user', content: query })
 
