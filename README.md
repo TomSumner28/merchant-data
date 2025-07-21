@@ -48,8 +48,10 @@ Uploaded files in the `knowledge_base` bucket are parsed automatically and saved
 to the `knowledge_base_entries` table. The home page GPT tools pull context from
 this table and from the `Merchants` and `Publishers` tables. Because GPT can
 only process a limited amount of text, the API summarises these tables before
-sending them to OpenAI. Counts of records are provided directly so questions
-such as "How many retailers are live?" return accurate numbers.
+sending them to OpenAI. When questions ask for live counts or lists, the API
+queries Supabase in real time to return accurate numbers. For contractual or
+policy questions it searches the `knowledge_base_entries.extracted_text` column
+and includes the most relevant passages.
 
 The home page includes a Draft Reply tool that can generate email responses. Use
 the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,

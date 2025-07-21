@@ -16,54 +16,74 @@ export default async function handler(req, res) {
   try {
     let systemMessage = 'You are a helpful assistant.'
     let supabaseContext = ''
+
+    const parseIntent = (text) => {
+      const lower = text.toLowerCase()
+      const info = {}
+      if (/merchant|retailer/.test(lower)) info.table = 'Merchants'
+      if (/publisher/.test(lower)) info.table = info.table || 'Publishers'
+      if (/how many|count/.test(lower)) info.action = 'count'
+      if (/list/.test(lower)) info.action = 'list'
+      if (/live/.test(lower)) info.status = 'live'
+      const regionMatch = lower.match(/in(?: the)? ([a-z ]+)/)
+      if (regionMatch) info.region = regionMatch[1].trim()
+      return info
+    }
+
     if (supabase) {
-      const keywords = query.toLowerCase().split(/\s+/).slice(0, 3)
-      const [merchants, merchantCountRes, publishers, publisherCountRes, kb] =
-        await Promise.all([
+      const intent = parseIntent(query)
+      if (intent.table && intent.action === 'count') {
+        let qb = supabase.from(intent.table).select('*', { count: 'exact', head: true })
+        if (intent.status) qb = qb.eq('status', intent.status)
+        if (intent.region) qb = qb.ilike('region', `%${intent.region}%`)
+        const { count = 0 } = await qb
+        supabaseContext += `There are ${count} ${intent.status ? intent.status + ' ' : ''}${intent.table.toLowerCase()}${intent.region ? ` in ${intent.region}` : ''}.\n`
+      } else if (intent.table && intent.action === 'list') {
+        let qb = supabase.from(intent.table).select('name')
+        if (intent.status) qb = qb.eq('status', intent.status)
+        if (intent.region) qb = qb.ilike('region', `%${intent.region}%`)
+        const { data } = await qb
+        if (data?.length) {
+          const names = data.map((d) => d.name).filter(Boolean)
+          supabaseContext += `${intent.table} names: ${names.join(', ')}.\n`
+        }
+      } else {
+        const [merchants, merchantCountRes, publishers, publisherCountRes] = await Promise.all([
           supabase.from('Merchants').select('name'),
           supabase.from('Merchants').select('*', { count: 'exact', head: true }),
           supabase.from('Publishers').select('name'),
-          supabase
-            .from('Publishers')
-            .select('*', { count: 'exact', head: true }),
-          supabase
-            .from('knowledge_base_entries')
-            .select('extracted_text')
-            .ilike(
-              'extracted_text',
-              `%${keywords.length ? keywords[0] : ''}%`
-            )
-            .order('uploaded_at', { ascending: false })
-            .limit(5),
+          supabase.from('Publishers').select('*', { count: 'exact', head: true })
         ])
 
-      const merchantCount = merchantCountRes.count || 0
-      const publisherCount = publisherCountRes.count || 0
-      systemMessage += ` There are currently ${merchantCount} merchants and ${publisherCount} publishers in the database.`
+        const merchantCount = merchantCountRes.count || 0
+        const publisherCount = publisherCountRes.count || 0
+        systemMessage += ` There are currently ${merchantCount} merchants and ${publisherCount} publishers in the database.`
 
-      if (merchants.data?.length) {
-        const names = merchants.data
-          .map((m) => m.name)
-          .filter(Boolean)
-          .slice(0, 50)
-        if (names.length) {
-          supabaseContext += `Merchant names: ${names.join(', ')}.\n`
+        if (merchants.data?.length) {
+          const names = merchants.data.map((m) => m.name).filter(Boolean).slice(0, 50)
+          if (names.length) {
+            supabaseContext += `Merchant names: ${names.join(', ')}.\n`
+          }
+        }
+        if (publishers.data?.length) {
+          const names = publishers.data.map((p) => p.name).filter(Boolean).slice(0, 50)
+          if (names.length) {
+            supabaseContext += `Publisher names: ${names.join(', ')}.\n`
+          }
         }
       }
-      if (publishers.data?.length) {
-        const names = publishers.data
-          .map((p) => p.name)
-          .filter(Boolean)
-          .slice(0, 50)
-        if (names.length) {
-          supabaseContext += `Publisher names: ${names.join(', ')}.\n`
+
+      const needKb = /clause|contract|policy|procedure|process/i.test(query)
+      if (needKb) {
+        const { data: kb } = await supabase
+          .from('knowledge_base_entries')
+          .select('extracted_text')
+          .textSearch('extracted_text', query, { type: 'websearch' })
+          .order('uploaded_at', { ascending: false })
+          .limit(5)
+        if (kb?.length) {
+          supabaseContext += kb.map((d) => d.extracted_text).join('\n').slice(0, 4000)
         }
-      }
-      if (kb.data?.length) {
-        supabaseContext += kb.data
-          .map((d) => d.extracted_text)
-          .join('\n')
-          .slice(0, 4000)
       }
     }
 
