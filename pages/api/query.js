@@ -48,6 +48,22 @@ async function fetchClauseText(clauseNum) {
   }
 }
 
+function parseRegions(str) {
+  if (!str) return []
+  const lower = str.toLowerCase()
+  const regions = []
+  if (/(^|,|\s)(uk|united kingdom|great britain|gb)(,|\s|$)/.test(lower)) {
+    regions.push('UK')
+  }
+  if (/(^|,|\s)(eu|europe)(,|\s|$)/.test(lower)) {
+    regions.push('Europe')
+  }
+  if (/(^|,|\s)(usa|united states|us|america)(,|\s|$)/.test(lower)) {
+    regions.push('USA')
+  }
+  return Array.from(new Set(regions))
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -82,9 +98,12 @@ export default async function handler(req, res) {
       usa: 'USA',
       'united states': 'USA',
       us: 'USA',
-      canada: 'Canada',
+      america: 'USA',
       uk: 'UK',
-      'united kingdom': 'UK'
+      'united kingdom': 'UK',
+      gb: 'UK',
+      eu: 'Europe',
+      europe: 'Europe'
     }
 
     const parseIntent = (text) => {
@@ -139,11 +158,20 @@ export default async function handler(req, res) {
       }
 
       if (intent.table && intent.action === 'count') {
-        let qb = supabase.from(intent.table).select('*', { count: 'exact', head: true })
-        if (intent.status) qb = qb.eq('"Deal Stage"', intent.status)
-        if (intent.region) qb = qb.ilike('"Countries"', `%${intent.region}%`)
-        const { count = 0, error } = await qb
-        console.log('Count query', { table: intent.table, count, error })
+        const { data, error } = await supabase.from(intent.table).select('*')
+        if (error) {
+          console.error('Count query error', error)
+          return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
+        }
+        let rows = data || []
+        if (intent.status) {
+          rows = rows.filter((r) => (r['Deal Stage'] || '').toLowerCase() === intent.status)
+        }
+        if (intent.region) {
+          rows = rows.filter((r) => parseRegions(r['Countries']).includes(intent.region))
+        }
+        const count = rows.length
+        console.log('Count query', { table: intent.table, count })
         if (!count) {
           return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
         }
@@ -151,15 +179,22 @@ export default async function handler(req, res) {
       }
 
       if (intent.table && intent.action === 'list') {
-        let qb = supabase.from(intent.table).select('"Merchant"')
-        if (intent.status) qb = qb.eq('"Deal Stage"', intent.status)
-        if (intent.region) qb = qb.ilike('"Countries"', `%${intent.region}%`)
-        const { data, error } = await qb
-        console.log('List query', { table: intent.table, found: data?.length, error })
-        if (!data?.length) {
+        const { data, error } = await supabase.from(intent.table).select('*')
+        if (error) {
+          console.error('List query error', error)
           return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
         }
-        const names = data.map((d) => d["Merchant"]).filter(Boolean)
+        let rows = data || []
+        if (intent.status) {
+          rows = rows.filter((r) => (r['Deal Stage'] || '').toLowerCase() === intent.status)
+        }
+        if (intent.region) {
+          rows = rows.filter((r) => parseRegions(r['Countries']).includes(intent.region))
+        }
+        const names = rows.map((r) => r['Merchant'] || r['Network_Publishers']).filter(Boolean)
+        if (!names.length) {
+          return res.status(200).json({ result: 'We could not find any matching entries for your request.' })
+        }
         return res.status(200).json({ result: names.join(', ') })
       }
 

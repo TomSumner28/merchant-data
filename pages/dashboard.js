@@ -12,6 +12,22 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+function parseRegions(str) {
+  if (!str) return []
+  const lower = str.toLowerCase()
+  const regions = []
+  if (/(^|,|\s)(uk|united kingdom|great britain|gb)(,|\s|$)/.test(lower)) {
+    regions.push('UK')
+  }
+  if (/(^|,|\s)(eu|europe)(,|\s|$)/.test(lower)) {
+    regions.push('Europe')
+  }
+  if (/(^|,|\s)(usa|united states|us|america)(,|\s|$)/.test(lower)) {
+    regions.push('USA')
+  }
+  return Array.from(new Set(regions))
+}
+
 export default function Dashboard() {
   const [merchants, setMerchants] = useState([])
   const [publishers, setPublishers] = useState([])
@@ -51,8 +67,14 @@ export default function Dashboard() {
 
   if (view === 'merchants') {
     merchants.forEach((m) => {
-      const region = m["Countries"] || 'Unknown'
-      regionCounts[region] = (regionCounts[region] || 0) + 1
+      const regions = parseRegions(m["Countries"])
+      if (regions.length === 0) {
+        regionCounts['Other'] = (regionCounts['Other'] || 0) + 1
+      } else {
+        regions.forEach((r) => {
+          regionCounts[r] = (regionCounts[r] || 0) + 1
+        })
+      }
 
       const method = m["Billing Type"] || 'Unknown'
       paymentCounts[method] = (paymentCounts[method] || 0) + 1
@@ -80,7 +102,10 @@ export default function Dashboard() {
 
   const totalRetailers = merchants.length
   const avgCashback = cashbackNum ? cashbackSum / cashbackNum : 0
-  const regionData = Object.entries(regionCounts).map(([region, count]) => ({ region, count }))
+  const orderedRegions = ['UK', 'Europe', 'USA', 'Other']
+  const regionData = orderedRegions
+    .map((r) => ({ region: r, count: regionCounts[r] || 0 }))
+    .filter((d) => d.count > 0)
   const paymentData = Object.entries(paymentCounts).map(([method, count]) => ({ method, count }))
   const statusData = Object.entries(statusCounts).map(([status, count]) => ({ status, count }))
 
