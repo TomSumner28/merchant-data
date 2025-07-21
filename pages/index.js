@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function Home() {
   const [chatInput, setChatInput] = useState('')
@@ -10,6 +10,11 @@ export default function Home() {
   const [draftResponse, setDraftResponse] = useState('')
   const [loadingDraft, setLoadingDraft] = useState(false)
   const [tone, setTone] = useState('general')
+  const bottomRef = useRef(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatHistory, loadingChat])
 
   const sendChat = async () => {
     if (!chatInput) return
@@ -60,6 +65,7 @@ export default function Home() {
             </div>
           ))}
           {loadingChat && <p>Thinking...</p>}
+          <div ref={bottomRef} />
         </div>
       )}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: 40 }}>

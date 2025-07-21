@@ -6,6 +6,48 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabase =
   supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
 
+function extractClauseFromText(text, clause) {
+  if (!text) return null
+  const lines = text.split(/\n+/)
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].toLowerCase().includes(clause.toLowerCase())) {
+      let out = lines[i]
+      for (let j = i + 1; j < lines.length; j++) {
+        if (/^\d+(\.\d+)*\b/.test(lines[j].trim())) break
+        out += ' ' + lines[j]
+      }
+      return out.trim()
+    }
+  }
+  return null
+}
+
+async function fetchClauseText(clauseNum) {
+  if (!supabase) return null
+  const { data } = await supabase
+    .from('knowledge_base_entries')
+    .select('extracted_text')
+    .ilike('extracted_text', `%${clauseNum}%`)
+
+  if (data?.length) {
+    for (const row of data) {
+      const snippet = extractClauseFromText(row.extracted_text, clauseNum)
+      if (snippet) return snippet
+    }
+  }
+
+  try {
+    const resp = await axios.get(
+      'https://therewardcollection.com/master-general-service-agreement/'
+    )
+    const plain = resp.data.replace(/<[^>]+>/g, ' ')
+    return extractClauseFromText(plain, clauseNum)
+  } catch (e) {
+    console.error('fetch clause error', e.message)
+    return null
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -83,6 +125,16 @@ export default async function handler(req, res) {
     if (supabase) {
       const intent = parseIntent(query)
       console.log('Parsed intent:', intent)
+      const clauseMatch = query.match(/clause\s*(\d+(?:\.\d+)?)/i)
+      if (clauseMatch) {
+        const clauseNum = clauseMatch[1]
+        const clauseText = await fetchClauseText(clauseNum)
+        if (clauseText) {
+          supabaseContext += `Clause ${clauseNum}: ${clauseText}\n`
+        } else {
+          supabaseContext += `Clause ${clauseNum} not found.\n`
+        }
+      }
       if (intent.table && intent.action === 'count') {
         let qb = supabase.from(intent.table).select('*', { count: 'exact', head: true })
         if (intent.status) qb = qb.eq('status', intent.status)
