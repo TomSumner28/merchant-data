@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   PieChart,
   Pie,
   Cell,
@@ -91,7 +93,8 @@ export default function Dashboard() {
   } else {
     publishers.forEach((p) => {
       const pub = p["Network_Publishers"] || 'Unknown'
-      const reach = parseFloat(p["Reach"]) || 0
+      const reachVal = (p["Reach"] || '').toString().replace(/,/g, '')
+      const reach = parseFloat(reachVal) || 0
       reachByPub[pub] = (reachByPub[pub] || 0) + reach
       totalReach += reach
 
@@ -134,7 +137,7 @@ export default function Dashboard() {
         </>
       )}
       {view === 'publishers' && (
-        <p>Total reach: {totalReach}</p>
+        <p>Total reach: {totalReach.toLocaleString()}</p>
       )}
 
       {view === 'merchants' && (
@@ -144,7 +147,7 @@ export default function Dashboard() {
             <BarChart data={regionData}>
               <XAxis dataKey="region" stroke="#ccc" />
               <YAxis stroke="#ccc" />
-              <Tooltip />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
               <Bar dataKey="count" fill="#5ec2f7" />
             </BarChart>
           </ResponsiveContainer>
@@ -154,7 +157,7 @@ export default function Dashboard() {
             <BarChart data={statusData}>
               <XAxis dataKey="status" stroke="#ccc" />
               <YAxis stroke="#ccc" />
-              <Tooltip />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
               <Bar dataKey="count" fill="#a6e3e9" />
             </BarChart>
           </ResponsiveContainer>
@@ -167,7 +170,7 @@ export default function Dashboard() {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
         </>
@@ -177,13 +180,39 @@ export default function Dashboard() {
         <>
           <h3>Reach by Publisher</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={reachData}>
+            <LineChart data={reachData}>
               <XAxis dataKey="publisher" stroke="#ccc" />
               <YAxis stroke="#ccc" />
-              <Tooltip />
-              <Bar dataKey="reach" fill="#5ec2f7" />
-            </BarChart>
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Line type="monotone" dataKey="reach" stroke="#5ec2f7" />
+            </LineChart>
           </ResponsiveContainer>
+
+          <h3>Reach Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={reachData}
+                dataKey="reach"
+                nameKey="publisher"
+                outerRadius={100}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`}
+              >
+                {reachData.map((entry, index) => (
+                  <Cell key={`cell-pie-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+            </PieChart>
+          </ResponsiveContainer>
+
+          <ul>
+            {reachData.map((d) => (
+              <li key={d.publisher}>
+                {d.publisher}: {d.reach.toLocaleString()} ({((d.reach / totalReach) * 100).toFixed(1)}%)
+              </li>
+            ))}
+          </ul>
 
           <h3>New Customer Offers</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -193,7 +222,7 @@ export default function Dashboard() {
                   <Cell key={`cell-p-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
         </>

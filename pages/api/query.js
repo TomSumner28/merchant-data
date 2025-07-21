@@ -228,7 +228,7 @@ export default async function handler(req, res) {
     }
 
     if (email) {
-      systemMessage = 'You are a helpful assistant that replies in a professional email format. Only answer using the provided context. If the information is not in the context, respond with "This information is not available in our records."'
+      systemMessage = 'You are a helpful assistant that writes concise professional email replies. Only answer using the provided context. If the information is not in the context, respond with "This information is not available in our records."'
       if (tone && tone !== 'general') {
         switch (tone) {
           case 'sales':
