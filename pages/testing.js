@@ -14,8 +14,8 @@ export default function Testing() {
     }
     async function fetchData() {
       const [merchantsRes, publishersRes, entriesRes] = await Promise.all([
-        supabase.from('Merchants').select('*').limit(50),
-        supabase.from('Publishers').select('*').limit(50),
+        supabase.from('Merchants').select('*'),
+        supabase.from('Publishers').select('*'),
         supabase
           .from('knowledge_base_entries')
           .select('*')

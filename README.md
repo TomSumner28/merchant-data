@@ -45,9 +45,11 @@ This project provides an interface for the Reward Collection tools. Files for th
    ```
 
 Uploaded files in the `knowledge_base` bucket are parsed automatically and saved
-to the `knowledge_base_entries` table. The home page GPT tools load all entries
-from this table, along with data from the `Merchants` and `Publishers` tables,
-to provide richer answers.
+to the `knowledge_base_entries` table. The home page GPT tools pull context from
+this table and from the `Merchants` and `Publishers` tables. Because GPT can
+only process a limited amount of text, the API summarises these tables before
+sending them to OpenAI. Counts of records are provided directly so questions
+such as "How many retailers are live?" return accurate numbers.
 
 The home page includes a Draft Reply tool that can generate email responses. Use
 the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales,
@@ -56,6 +58,7 @@ Account Manager or Legal.
 ## Testing Page
 
 Visit `/testing` to see the exact data loaded from Supabase and passed to GPT.
-The page lists the first 50 Merchants, first 50 Publishers, and every knowledge
-base entry in your project. Use this page to verify that GPT has access to the
-expected records.
+The page lists **all** Merchants, **all** Publishers and every knowledge base
+entry in your project. Use this page to verify that GPT has access to the full
+dataset. If you have thousands of rows consider adding pagination or filtering
+when browsing this page.

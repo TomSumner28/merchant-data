@@ -17,23 +17,53 @@ export default async function handler(req, res) {
     let systemMessage = 'You are a helpful assistant.'
     let supabaseContext = ''
     if (supabase) {
-      const [merchants, publishers, kb] = await Promise.all([
-        supabase.from('Merchants').select('*').limit(50),
-        supabase.from('Publishers').select('*').limit(50),
-        supabase
-          .from('knowledge_base_entries')
-          .select('*')
-          .order('uploaded_at', { ascending: false })
-      ])
+      const keywords = query.toLowerCase().split(/\s+/).slice(0, 3)
+      const [merchants, merchantCountRes, publishers, publisherCountRes, kb] =
+        await Promise.all([
+          supabase.from('Merchants').select('name'),
+          supabase.from('Merchants').select('*', { count: 'exact', head: true }),
+          supabase.from('Publishers').select('name'),
+          supabase
+            .from('Publishers')
+            .select('*', { count: 'exact', head: true }),
+          supabase
+            .from('knowledge_base_entries')
+            .select('extracted_text')
+            .ilike(
+              'extracted_text',
+              `%${keywords.length ? keywords[0] : ''}%`
+            )
+            .order('uploaded_at', { ascending: false })
+            .limit(5),
+        ])
 
-      if (merchants.data) {
-        supabaseContext += JSON.stringify(merchants.data) + '\n'
+      const merchantCount = merchantCountRes.count || 0
+      const publisherCount = publisherCountRes.count || 0
+      systemMessage += ` There are currently ${merchantCount} merchants and ${publisherCount} publishers in the database.`
+
+      if (merchants.data?.length) {
+        const names = merchants.data
+          .map((m) => m.name)
+          .filter(Boolean)
+          .slice(0, 50)
+        if (names.length) {
+          supabaseContext += `Merchant names: ${names.join(', ')}.\n`
+        }
       }
-      if (publishers.data) {
-        supabaseContext += JSON.stringify(publishers.data) + '\n'
+      if (publishers.data?.length) {
+        const names = publishers.data
+          .map((p) => p.name)
+          .filter(Boolean)
+          .slice(0, 50)
+        if (names.length) {
+          supabaseContext += `Publisher names: ${names.join(', ')}.\n`
+        }
       }
-      if (kb.data) {
-        supabaseContext += kb.data.map((d) => d.extracted_text).join('\n')
+      if (kb.data?.length) {
+        supabaseContext += kb.data
+          .map((d) => d.extracted_text)
+          .join('\n')
+          .slice(0, 4000)
       }
     }
 
