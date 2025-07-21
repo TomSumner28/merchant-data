@@ -16,6 +16,19 @@ export default function Home() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatHistory, loadingChat])
 
+  useEffect(() => {
+    const saved = localStorage.getItem('chatHistory')
+    if (saved) {
+      try {
+        setChatHistory(JSON.parse(saved))
+      } catch {}
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory))
+  }, [chatHistory])
+
   const sendChat = async () => {
     if (!chatInput) return
     setLoadingChat(true)

@@ -215,12 +215,15 @@ export default async function handler(req, res) {
 
       const { data: kb } = await supabase
         .from('knowledge_base_entries')
-        .select('extracted_text')
+        .select('*')
         .textSearch('extracted_text', query, { type: 'websearch' })
         .order('uploaded_at', { ascending: false })
         .limit(5)
       if (kb?.length) {
-        supabaseContext += kb.map((d) => d.extracted_text).join('\n').slice(0, 4000)
+        const kbSummary = kb
+          .map((d) => `${d.file_name} (${d.file_type}): ${d.extracted_text}`)
+          .join('\n')
+        supabaseContext += kbSummary.slice(0, 4000)
       }
     }
 
