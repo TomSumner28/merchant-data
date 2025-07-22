@@ -296,9 +296,9 @@ export default function Dashboard() {
         <div className="card">
           <h3>Reach by Publisher</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={reachData}>
-              <XAxis dataKey="publisher" stroke="#ccc" />
-              <YAxis stroke="#ccc" />
+            <BarChart data={reachData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
+              <XAxis dataKey="publisher" stroke="#ccc" tickMargin={10} />
+              <YAxis stroke="#ccc" tickMargin={10} tickFormatter={(v) => v.toLocaleString()} />
               <Tooltip
                 content={({ payload }) => {
                   if (payload && payload.length) {
@@ -325,9 +325,9 @@ export default function Dashboard() {
 
           <h3>Reach by Region</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={regionReachData}>
-              <XAxis dataKey="region" stroke="#ccc" />
-              <YAxis stroke="#ccc" />
+            <BarChart data={regionReachData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
+              <XAxis dataKey="region" stroke="#ccc" tickMargin={10} />
+              <YAxis stroke="#ccc" tickMargin={10} tickFormatter={(v) => v.toLocaleString()} />
               <Tooltip formatter={(v) => v.toLocaleString()} />
               <Bar dataKey="reach" fill="#82ca9d" />
             </BarChart>
@@ -362,17 +362,7 @@ export default function Dashboard() {
           </div>
 
           <h3>New Customer Offers</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={newCustomerData} dataKey="reach" nameKey="type" outerRadius={100} label>
-                {newCustomerData.map((entry, index) => (
-                  <Cell key={`cell-p-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(v) => v.toLocaleString()} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
             <div style={{ flex: 1 }}>
               <h4>Yes</h4>
               <ul>
@@ -380,6 +370,18 @@ export default function Dashboard() {
                   <li key={name}>{name}</li>
                 ))}
               </ul>
+            </div>
+            <div style={{ flex: 1 }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie data={newCustomerData} dataKey="reach" nameKey="type" outerRadius={100} label>
+                    {newCustomerData.map((entry, index) => (
+                      <Cell key={`cell-p-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => v.toLocaleString()} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
             <div style={{ flex: 1 }}>
               <h4>No</h4>
