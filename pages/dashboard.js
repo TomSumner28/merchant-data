@@ -63,6 +63,7 @@ function MultiSelect({ label, options, value, onChange }) {
 export default function Dashboard() {
   const [merchants, setMerchants] = useState([])
   const [publishers, setPublishers] = useState([])
+  const [liveBrands, setLiveBrands] = useState([])
   const [view, setView] = useState('merchants')
   const [error, setError] = useState('')
   const [targetFilters, setTargetFilters] = useState({
@@ -82,16 +83,18 @@ export default function Dashboard() {
       return
     }
     async function load() {
-      const [mRes, pRes] = await Promise.all([
+      const [mRes, pRes, bRes] = await Promise.all([
         supabase.from('Merchants').select('*'),
-        supabase.from('Publishers').select('*')
+        supabase.from('Publishers').select('*'),
+        supabase.from('Live Brands').select('*')
       ])
-      if (mRes.error || pRes.error) {
-        console.error(mRes.error || pRes.error)
+      if (mRes.error || pRes.error || bRes.error) {
+        console.error(mRes.error || pRes.error || bRes.error)
         setError('Failed to load data')
       } else {
         setMerchants(mRes.data || [])
         setPublishers(pRes.data || [])
+        setLiveBrands(bRes.data || [])
       }
     }
     load()
@@ -107,6 +110,8 @@ export default function Dashboard() {
   let totalStores = 0
   let cashbackSum = 0
   let cashbackNum = 0
+
+  const liveCounts = {}
 
   const reachByPub = {}
   const subPubsByPub = {}
@@ -188,6 +193,36 @@ export default function Dashboard() {
     })
   }
 
+  const publisherCols = [
+    'Fidel',
+    'Mastercard',
+    'Revolut',
+    'Hyperjar',
+    'Pluxee',
+    'Reward Insight',
+    'AnnaMoney',
+    'Curve',
+    'Pockit',
+    'Railsr',
+    'Cardlytics',
+    'UW',
+    'Collinson UK',
+    'Collinson US',
+    'PNC',
+    'CashApp',
+    'Drop',
+    'Olive',
+    'Loyalty Key'
+  ]
+
+  liveBrands.forEach((row) => {
+    publisherCols.forEach((col) => {
+      if (row[col]) {
+        liveCounts[col] = (liveCounts[col] || 0) + 1
+      }
+    })
+  })
+
   const totalRetailers = merchants.length
   const avgCashback = cashbackNum ? cashbackSum / cashbackNum : 0
   const orderedRegions = ['UK', 'Europe', 'USA', 'Other']
@@ -200,6 +235,9 @@ export default function Dashboard() {
   const verticalData = Object.entries(verticalCounts).map(([vert, count]) => ({ vertical: vert, count }))
   const tacticData = Object.entries(tacticalCounts).map(([type, count]) => ({ type, count }))
   const leadSourceData = Object.entries(leadSourceCounts).map(([source, count]) => ({ source, count }))
+  const livePublisherData = Object.entries(liveCounts)
+    .map(([publisher, count]) => ({ publisher, count }))
+    .sort((a, b) => b.count - a.count)
 
   const topMerchants = merchants
     .map((m) => {
@@ -595,6 +633,12 @@ export default function Dashboard() {
             </ol>
           </div>
 
+          <h3>Live Retailers by Publisher</h3>
+          <ul>
+            {livePublisherData.map((d) => (
+              <li key={d.publisher}>{d.publisher}: {d.count}</li>
+            ))}
+          </ul>
 
         </div>
       )}

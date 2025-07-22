@@ -74,7 +74,7 @@ export default async function handler(req, res) {
   console.log('Received query:', query)
 
   try {
-    let systemMessage = 'You are a helpful assistant. Use the merchants, publishers, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
+    let systemMessage = 'You are a helpful assistant. Use the merchants, publishers, live brands, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
     let supabaseContext = ''
 
     const tableMap = {
@@ -82,6 +82,10 @@ export default async function handler(req, res) {
       retailers: 'Merchants',
       merchant: 'Merchants',
       merchants: 'Merchants',
+      brand: 'Live Brands',
+      brands: 'Live Brands',
+      'live brand': 'Live Brands',
+      'live brands': 'Live Brands',
       partner: 'Publishers',
       partners: 'Publishers',
       publisher: 'Publishers',
@@ -214,9 +218,10 @@ export default async function handler(req, res) {
         }
       }
 
-      const [merchants, publishers] = await Promise.all([
+      const [merchants, publishers, liveBrands] = await Promise.all([
         supabase.from('Merchants').select('*'),
-        supabase.from('Publishers').select('*')
+        supabase.from('Publishers').select('*'),
+        supabase.from('Live Brands').select('*')
       ])
 
       let { data: kb } = await supabase
@@ -251,10 +256,15 @@ export default async function handler(req, res) {
         const publisherSummary = JSON.stringify(publishers.data)
         supabaseContext += `Publishers data: ${publisherSummary.slice(0, 1500)}\n`
       }
+
+      if (liveBrands.data?.length) {
+        const brandSummary = JSON.stringify(liveBrands.data)
+        supabaseContext += `Live Brands data: ${brandSummary.slice(0, 1500)}\n`
+      }
     }
 
     if (email) {
-      systemMessage = 'You are a helpful assistant that writes concise professional email replies in a proper email format including a greeting and closing. Use the merchants, publishers, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
+      systemMessage = 'You are a helpful assistant that writes concise professional email replies in a proper email format including a greeting and closing. Use the merchants, publishers, live brands, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
       if (tone && tone.toLowerCase() !== 'general') {
         switch (tone.toLowerCase()) {
           case 'sales':

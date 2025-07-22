@@ -48,7 +48,7 @@ The interface uses The Reward Collection branding with TRC blues (#163165 and #2
 
 Uploaded files in the `knowledge_base` bucket are parsed automatically and saved
 to the `knowledge_base_entries` table. The home page GPT tools pull context from
-this table and from the `Merchants` and `Publishers` tables. Because GPT can
+this table and from the `Merchants`, `Publishers`, and `Live Brands` tables. Because GPT can
 only process a limited amount of text, the API summarises these tables before
 sending them to OpenAI. When questions ask for live counts or lists, the API
 queries Supabase in real time to return accurate numbers. For contractual or
@@ -71,7 +71,7 @@ This mapping allows natural language questions to be converted into live Supabas
 queries so counts and lists stay accurate even if your wording doesn’t match the
 database schema exactly.
 
-Questions mentioning partners or publishers are resolved against the **Publishers** table. Anything about The Reward Collection in general—FAQs, onboarding steps, contracts, or website text—is searched in the `knowledge_base_entries.extracted_text` column.
+Questions mentioning partners or publishers are resolved against the **Publishers** table, while queries about brands reference the **Live Brands** table. Anything about The Reward Collection in general—FAQs, onboarding steps, contracts, or website text—is searched in the `knowledge_base_entries.extracted_text` column.
 
 ### Strict data grounding
 
