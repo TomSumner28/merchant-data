@@ -227,7 +227,10 @@ export default function Dashboard() {
         (val || '').toString().toLowerCase().startsWith('y') ? 'Yes' : 'No'
       return {
         id: p.id,
-        publisher: p['Network_Publishers'] || 'Unknown',
+        publisher:
+          p['Sub_Publishers']?.trim() ||
+          p['Network_Publishers'] ||
+          'Unknown',
         reach: parseFloat((p['Reach'] || '0').toString().replace(/,/g, '')) || 0,
         regions: pubRegions,
         click: toYesNo(p['Click_to_Activate']),
