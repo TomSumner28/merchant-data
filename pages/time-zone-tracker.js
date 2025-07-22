@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 const zones = [
-  { label: 'UK - GMT', timeZone: 'Europe/London' },
+  { label: 'Time Zone BST', timeZone: 'Europe/London' },
   { label: 'Eastern Time (US)', timeZone: 'America/New_York' },
   { label: 'Central Time (US)', timeZone: 'America/Chicago' },
   { label: 'Mountain Time (US)', timeZone: 'America/Denver' },
