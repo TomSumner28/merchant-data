@@ -135,9 +135,13 @@ export default function Dashboard() {
   const leadSourceData = Object.entries(leadSourceCounts).map(([source, count]) => ({ source, count }))
 
   const topMerchants = merchants
-    .map((m) => ({ name: m["Merchant"], revenue: parseFloat((m["Revenue (£m)"] || '').toString().replace(/,/g, '')) || 0 }))
+    .map((m) => {
+      const raw = (m["Revenue (£m)"] || '').toString()
+      const num = parseFloat(raw.replace(/[^0-9.]+/g, ''))
+      return { name: m["Merchant"], revenue: isNaN(num) ? 0 : num }
+    })
     .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 20)
+    .slice(0, 10)
 
   const reachData = Object.entries(reachByPub).map(([publisher, reach]) => ({ publisher, reach }))
   const newCustomerData = Object.entries(newCustomerCounts).map(([type, reach]) => ({ type, reach }))
@@ -252,7 +256,9 @@ export default function Dashboard() {
           <h3>Top Merchants</h3>
           <ol>
             {topMerchants.map((m) => (
-              <li key={m.name}>{m.name}</li>
+              <li key={m.name}>
+                {m.name} - £{m.revenue.toFixed(2)}m
+              </li>
             ))}
           </ol>
         </div>
