@@ -33,6 +33,16 @@ export default function Dashboard() {
   const [publishers, setPublishers] = useState([])
   const [view, setView] = useState('merchants')
   const [error, setError] = useState('')
+  const [targetFilters, setTargetFilters] = useState({
+    regions: [],
+    click: '',
+    minmax: '',
+    newCustomer: '',
+    firstTime: '',
+    budgets: '',
+    refunds: '',
+    fixed: ''
+  })
 
   useEffect(() => {
     if (!supabase) {
@@ -173,6 +183,42 @@ export default function Dashboard() {
     .filter((d) => d.reach > 0)
 
   const newCustomerData = Object.entries(newCustomerCounts).map(([type, reach]) => ({ type, reach }))
+
+  const regionOptions = Array.from(
+    new Set(publishers.flatMap((p) => parseRegions(p['Regions'])))
+  ).filter(Boolean)
+
+  const filteredPublishers = publishers
+    .map((p) => {
+      const pubRegions = parseRegions(p['Regions'])
+      const toYesNo = (val) =>
+        (val || '').toString().toLowerCase().startsWith('y') ? 'Yes' : 'No'
+      return {
+        id: p.id,
+        publisher: p['Network_Publishers'] || 'Unknown',
+        reach: parseFloat((p['Reach'] || '0').toString().replace(/,/g, '')) || 0,
+        regions: pubRegions,
+        click: toYesNo(p['Click_to_Activate']),
+        minmax: toYesNo(p['Minimum/Maximum_Spend']),
+        newCustomer: toYesNo(p['New_Customers']),
+        firstTime: toYesNo(p['First_Time_Offer']),
+        budgets: toYesNo(p['Budgets']),
+        refunds: toYesNo(p['Refunds']),
+        fixed: toYesNo(p['Fixed_CPA'])
+      }
+    })
+    .filter((p) => {
+      const f = targetFilters
+      if (f.regions.length && !f.regions.some((r) => p.regions.includes(r))) return false
+      if (f.click && p.click !== f.click) return false
+      if (f.minmax && p.minmax !== f.minmax) return false
+      if (f.newCustomer && p.newCustomer !== f.newCustomer) return false
+      if (f.firstTime && p.firstTime !== f.firstTime) return false
+      if (f.budgets && p.budgets !== f.budgets) return false
+      if (f.refunds && p.refunds !== f.refunds) return false
+      if (f.fixed && p.fixed !== f.fixed) return false
+      return true
+    })
 
   const COLORS = ['#5ec2f7', '#a6e3e9', '#f9a826', '#82ca9d', '#8884d8']
 
@@ -383,15 +429,150 @@ export default function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div style={{ flex: 1 }}>
-              <h4>No</h4>
-              <ul>
-                {newCustomerNames.No.map((name) => (
-                  <li key={name}>{name}</li>
+        <div style={{ flex: 1 }}>
+          <h4>No</h4>
+          <ul>
+            {newCustomerNames.No.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+          <h3>Publisher Targeting</h3>
+          <div style={{ marginBottom: '1rem' }}>
+            <label>
+              Regions:
+              <select
+                multiple
+                value={targetFilters.regions}
+                onChange={(e) =>
+                  setTargetFilters({
+                    ...targetFilters,
+                    regions: Array.from(e.target.selectedOptions).map((o) =>
+                      o.value
+                    ),
+                  })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                {regionOptions.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
                 ))}
-              </ul>
-            </div>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Click To Activate:
+              <select
+                value={targetFilters.click}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, click: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Minimum/Maximum Spend:
+              <select
+                value={targetFilters.minmax}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, minmax: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              New Customer Offer:
+              <select
+                value={targetFilters.newCustomer}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, newCustomer: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              First Time Offer:
+              <select
+                value={targetFilters.firstTime}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, firstTime: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Budgets:
+              <select
+                value={targetFilters.budgets}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, budgets: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Refunds:
+              <select
+                value={targetFilters.refunds}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, refunds: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Fixed Amount Offer:
+              <select
+                value={targetFilters.fixed}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, fixed: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
           </div>
+          <p>
+            Total reach:{' '}
+            {filteredPublishers.reduce((sum, p) => sum + p.reach, 0).toLocaleString()}
+          </p>
+          <ul>
+            {filteredPublishers.map((p) => (
+              <li key={p.id}>
+                {p.publisher} - {p.reach.toLocaleString()}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
