@@ -28,6 +28,38 @@ function parseRegions(str) {
   return Array.from(new Set(regions))
 }
 
+function MultiSelect({ label, options, value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const toggle = () => setOpen(!open)
+  const handle = (opt) => {
+    const newVal = value.includes(opt)
+      ? value.filter((v) => v !== opt)
+      : [...value, opt]
+    onChange(newVal)
+  }
+  return (
+    <div className="multi-select">
+      <span onClick={toggle} className="multi-select-toggle">
+        {label}: {value.length ? value.join(', ') : 'Any'}
+      </span>
+      {open && (
+        <div className="multi-select-options">
+          {options.map((opt) => (
+            <label key={opt} className="option-row">
+              <input
+                type="checkbox"
+                checked={value.includes(opt)}
+                onChange={() => handle(opt)}
+              />{' '}
+              {opt}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const [merchants, setMerchants] = useState([])
   const [publishers, setPublishers] = useState([])
@@ -243,7 +275,142 @@ export default function Dashboard() {
         </div>
       )}
       {view === 'publishers' && (
-        <p>Total reach: {totalReach.toLocaleString()}</p>
+        <div className="card">
+          <h3>Publisher Targeting</h3>
+          <div style={{ marginBottom: '1rem' }}>
+            <MultiSelect
+              label="Regions"
+              options={regionOptions}
+              value={targetFilters.regions}
+              onChange={(val) =>
+                setTargetFilters({ ...targetFilters, regions: val })
+              }
+            />
+            <label style={{ marginLeft: '1rem' }}>
+              Click To Activate:
+              <select
+                value={targetFilters.click}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, click: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Minimum/Maximum Spend:
+              <select
+                value={targetFilters.minmax}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, minmax: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              New Customer Offer:
+              <select
+                value={targetFilters.newCustomer}
+                onChange={(e) =>
+                  setTargetFilters({
+                    ...targetFilters,
+                    newCustomer: e.target.value,
+                  })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              First Time Offer:
+              <select
+                value={targetFilters.firstTime}
+                onChange={(e) =>
+                  setTargetFilters({
+                    ...targetFilters,
+                    firstTime: e.target.value,
+                  })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Budgets:
+              <select
+                value={targetFilters.budgets}
+                onChange={(e) =>
+                  setTargetFilters({
+                    ...targetFilters,
+                    budgets: e.target.value,
+                  })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Refunds:
+              <select
+                value={targetFilters.refunds}
+                onChange={(e) =>
+                  setTargetFilters({
+                    ...targetFilters,
+                    refunds: e.target.value,
+                  })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              Fixed Amount Offer:
+              <select
+                value={targetFilters.fixed}
+                onChange={(e) =>
+                  setTargetFilters({ ...targetFilters, fixed: e.target.value })
+                }
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <option value="">Any</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </label>
+          </div>
+          <p>
+            Total reach:{' '}
+            {filteredPublishers
+              .reduce((sum, p) => sum + p.reach, 0)
+              .toLocaleString()}
+          </p>
+          <ul>
+            {filteredPublishers.map((p) => (
+              <li key={p.id}>
+                {p.publisher} - {p.reach.toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {view === 'merchants' && (
@@ -439,140 +606,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-          <h3>Publisher Targeting</h3>
-          <div style={{ marginBottom: '1rem' }}>
-            <label>
-              Regions:
-              <select
-                multiple
-                value={targetFilters.regions}
-                onChange={(e) =>
-                  setTargetFilters({
-                    ...targetFilters,
-                    regions: Array.from(e.target.selectedOptions).map((o) =>
-                      o.value
-                    ),
-                  })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                {regionOptions.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              Click To Activate:
-              <select
-                value={targetFilters.click}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, click: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              Minimum/Maximum Spend:
-              <select
-                value={targetFilters.minmax}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, minmax: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              New Customer Offer:
-              <select
-                value={targetFilters.newCustomer}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, newCustomer: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              First Time Offer:
-              <select
-                value={targetFilters.firstTime}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, firstTime: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              Budgets:
-              <select
-                value={targetFilters.budgets}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, budgets: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              Refunds:
-              <select
-                value={targetFilters.refunds}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, refunds: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-            <label style={{ marginLeft: '1rem' }}>
-              Fixed Amount Offer:
-              <select
-                value={targetFilters.fixed}
-                onChange={(e) =>
-                  setTargetFilters({ ...targetFilters, fixed: e.target.value })
-                }
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <option value="">Any</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </label>
-          </div>
-          <p>
-            Total reach:{' '}
-            {filteredPublishers.reduce((sum, p) => sum + p.reach, 0).toLocaleString()}
-          </p>
-          <ul>
-            {filteredPublishers.map((p) => (
-              <li key={p.id}>
-                {p.publisher} - {p.reach.toLocaleString()}
-              </li>
-            ))}
-          </ul>
         </div>
       )}
     </div>
