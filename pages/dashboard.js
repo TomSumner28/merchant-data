@@ -3,8 +3,6 @@ import { supabase } from '../lib/supabaseClient'
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -60,6 +58,7 @@ export default function Dashboard() {
   const regionCounts = {}
   const paymentCounts = {}
   const statusCounts = {}
+  const salesRepCounts = {}
   let cashbackSum = 0
   let cashbackNum = 0
 
@@ -83,6 +82,9 @@ export default function Dashboard() {
 
       const status = m["Deal Stage"] || 'Unknown'
       statusCounts[status] = (statusCounts[status] || 0) + 1
+
+      const rep = m["Sales Rep"] || 'Unknown'
+      salesRepCounts[rep] = (salesRepCounts[rep] || 0) + 1
 
       const cb = parseFloat(m["New Cashback"])
       if (!isNaN(cb)) {
@@ -111,6 +113,7 @@ export default function Dashboard() {
     .filter((d) => d.count > 0)
   const paymentData = Object.entries(paymentCounts).map(([method, count]) => ({ method, count }))
   const statusData = Object.entries(statusCounts).map(([status, count]) => ({ status, count }))
+  const salesRepData = Object.entries(salesRepCounts).map(([rep, count]) => ({ rep, count }))
 
   const reachData = Object.entries(reachByPub).map(([publisher, reach]) => ({ publisher, reach }))
   const newCustomerData = Object.entries(newCustomerCounts).map(([type, reach]) => ({ type, reach }))
@@ -173,6 +176,16 @@ export default function Dashboard() {
               <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
+
+          <h3>Retailers by Sales Rep</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={salesRepData}>
+              <XAxis dataKey="rep" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Bar dataKey="count" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 
@@ -180,12 +193,12 @@ export default function Dashboard() {
         <div className="card">
           <h3>Reach by Publisher</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={reachData}>
+            <BarChart data={reachData}>
               <XAxis dataKey="publisher" stroke="#ccc" />
               <YAxis stroke="#ccc" />
               <Tooltip formatter={(v) => v.toLocaleString()} />
-              <Line type="monotone" dataKey="reach" stroke="#5ec2f7" />
-            </LineChart>
+              <Bar dataKey="reach" fill="#5ec2f7" />
+            </BarChart>
           </ResponsiveContainer>
 
           <h3>Reach Distribution</h3>
