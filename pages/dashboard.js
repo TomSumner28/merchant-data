@@ -59,6 +59,10 @@ export default function Dashboard() {
   const paymentCounts = {}
   const statusCounts = {}
   const salesRepCounts = {}
+  const verticalCounts = {}
+  const tacticalCounts = { Always: 0, Tactical: 0 }
+  const leadSourceCounts = {}
+  let totalStores = 0
   let cashbackSum = 0
   let cashbackNum = 0
 
@@ -85,6 +89,18 @@ export default function Dashboard() {
 
       const rep = m["Sales Rep"] || 'Unknown'
       salesRepCounts[rep] = (salesRepCounts[rep] || 0) + 1
+
+      const vertical = m["Sales Vertical"] || 'Unknown'
+      verticalCounts[vertical] = (verticalCounts[vertical] || 0) + 1
+
+      const tactic = (m["Always On/Tactical"] || '').toLowerCase().startsWith('a') ? 'Always' : 'Tactical'
+      tacticalCounts[tactic] = (tacticalCounts[tactic] || 0) + 1
+
+      const lead = m["Lead Source"] || 'Unknown'
+      leadSourceCounts[lead] = (leadSourceCounts[lead] || 0) + 1
+
+      const stores = parseInt(m["No. of Stores"])
+      if (!isNaN(stores)) totalStores += stores
 
       const cb = parseFloat(m["New Cashback"])
       if (!isNaN(cb)) {
@@ -114,6 +130,14 @@ export default function Dashboard() {
   const paymentData = Object.entries(paymentCounts).map(([method, count]) => ({ method, count }))
   const statusData = Object.entries(statusCounts).map(([status, count]) => ({ status, count }))
   const salesRepData = Object.entries(salesRepCounts).map(([rep, count]) => ({ rep, count }))
+  const verticalData = Object.entries(verticalCounts).map(([vert, count]) => ({ vertical: vert, count }))
+  const tacticData = Object.entries(tacticalCounts).map(([type, count]) => ({ type, count }))
+  const leadSourceData = Object.entries(leadSourceCounts).map(([source, count]) => ({ source, count }))
+
+  const topMerchants = merchants
+    .map((m) => ({ name: m["Merchant"], revenue: parseFloat((m["Revenue (£m)"] || '').toString().replace(/,/g, '')) || 0 }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 20)
 
   const reachData = Object.entries(reachByPub).map(([publisher, reach]) => ({ publisher, reach }))
   const newCustomerData = Object.entries(newCustomerCounts).map(([type, reach]) => ({ type, reach }))
@@ -137,6 +161,7 @@ export default function Dashboard() {
         <div className="card">
           <p>Total retailers: {totalRetailers}</p>
           <p>Average cashback: {avgCashback.toFixed(2)}</p>
+          <p>Number of stores: {totalStores.toLocaleString()}</p>
         </div>
       )}
       {view === 'publishers' && (
@@ -176,6 +201,11 @@ export default function Dashboard() {
               <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {paymentData.map((p) => (
+              <li key={p.method}>{p.method}: {p.count}</li>
+            ))}
+          </ul>
 
           <h3>Retailers by Sales Rep</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -186,6 +216,45 @@ export default function Dashboard() {
               <Bar dataKey="count" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
+
+          <h3>Merchants by Vertical</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={verticalData}>
+              <XAxis dataKey="vertical" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Bar dataKey="count" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <h3>Always On vs Tactical</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={tacticData} dataKey="count" nameKey="type" outerRadius={100} label>
+                {tacticData.map((entry, index) => (
+                  <Cell key={`cell-tactic-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+            </PieChart>
+          </ResponsiveContainer>
+
+          <h3>Retailers by Lead Source</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={leadSourceData}>
+              <XAxis dataKey="source" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Bar dataKey="count" fill="#f9a826" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <h3>Top Merchants</h3>
+          <ol>
+            {topMerchants.map((m) => (
+              <li key={m.name}>{m.name}</li>
+            ))}
+          </ol>
         </div>
       )}
 
