@@ -2,6 +2,8 @@
 
 This project provides an interface for the Reward Collection tools. Files for the Knowledge Base are stored in Supabase Storage and used to enrich GPT replies on the home page. The homepage offers a multi-turn chat interface so you can hold a conversation with TRC's GPT assistant and a Draft Reply tool for email responses.
 
+The interface uses The Reward Collection branding with TRC blues (#163165 and #22A1F7) and loads in light mode by default. A toggle in the navigation bar lets you switch to dark mode, and your preference is saved in local storage.
+
 ## Supabase Setup
 
 1. [Create a Supabase project](https://supabase.com/).

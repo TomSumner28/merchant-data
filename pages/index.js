@@ -62,51 +62,53 @@ export default function Home() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2 style={{ color: '#5ec2f7' }}>Ask TRC</h2>
-      <div style={{ marginBottom: 10 }}>
-        <button onClick={() => setCollapsed(!collapsed)} style={{ marginRight: '1rem' }}>
-          {collapsed ? 'Expand' : 'Collapse'}
-        </button>
-        <button onClick={newChat}>New Chat</button>
-      </div>
-      {!collapsed && (
-        <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 20, background: '#1a1a1a', padding: 10 }}>
-          {chatHistory.map((m, idx) => (
-            <div key={idx} style={{ marginBottom: 10 }}>
-              <strong>{m.role === 'user' ? 'You' : 'TRC'}:</strong> {m.content}
-            </div>
-          ))}
-          {loadingChat && <p>Thinking...</p>}
-          <div ref={bottomRef} />
+    <div className="content">
+      <div className="card">
+        <h2 style={{ color: 'var(--accent)' }}>Ask TRC</h2>
+        <div style={{ marginBottom: 10 }}>
+          <button onClick={() => setCollapsed(!collapsed)} style={{ marginRight: '1rem' }}>
+            {collapsed ? 'Expand' : 'Collapse'}
+          </button>
+          <button onClick={newChat}>New Chat</button>
         </div>
-      )}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: 40 }}>
-        <input
-          type="text"
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Ask a question"
-          style={{ flex: 1, padding: 10 }}
-          onKeyDown={(e) => { if (e.key === 'Enter') sendChat() }}
-        />
-        <button onClick={sendChat} style={{ padding: '10px 20px' }}>Send</button>
+        {!collapsed && (
+          <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 20 }} className="card">
+            {chatHistory.map((m, idx) => (
+              <div key={idx} style={{ marginBottom: 10 }}>
+                <strong>{m.role === 'user' ? 'You' : 'TRC'}:</strong> {m.content}
+              </div>
+            ))}
+            {loadingChat && <p>Thinking...</p>}
+            <div ref={bottomRef} />
+          </div>
+        )}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: 40 }}>
+          <input
+            type="text"
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            placeholder="Ask a question"
+            style={{ flex: 1, padding: 10, borderRadius: 18, border: '1px solid var(--primary)' }}
+            onKeyDown={(e) => { if (e.key === 'Enter') sendChat() }}
+          />
+          <button onClick={sendChat} style={{ padding: '10px 20px', background: 'var(--primary)', color: '#fff', borderRadius: 18 }}>Send</button>
+        </div>
       </div>
 
-      <h2>Draft Reply</h2>
-      <div style={{ marginBottom: 20 }}>
+      <div className="card">
+        <h2>Draft Reply</h2>
         <textarea
           value={draftInput}
           onChange={(e) => setDraftInput(e.target.value)}
           placeholder="Paste an email or prompt"
           rows={10}
-          style={{ padding: 10, width: '100%' }}
+          style={{ padding: 10, width: '100%', borderRadius: 18, border: '1px solid var(--primary)' }}
         />
         <div style={{ marginTop: 10, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <button onClick={handleDraft} style={{ padding: '10px 20px' }}>Generate</button>
-          <label style={{ color: '#5ec2f7' }}>
+          <button onClick={handleDraft} style={{ padding: '10px 20px', background: 'var(--primary)', color: '#fff', borderRadius: 18 }}>Generate</button>
+          <label style={{ color: 'var(--accent)' }}>
             Tone Enhancer:
-            <select value={tone} onChange={(e) => setTone(e.target.value)} style={{ marginLeft: '0.5rem' }}>
+            <select value={tone} onChange={(e) => setTone(e.target.value)} style={{ marginLeft: '0.5rem', borderRadius: 8 }}>
               <option value="general">General</option>
               <option value="sales">Sales</option>
               <option value="account manager">Account Manager</option>
@@ -116,14 +118,14 @@ export default function Home() {
             </select>
           </label>
         </div>
+        {loadingDraft && <p>Thinking...</p>}
+        {draftResponse && (
+          <div style={{ marginTop: 20 }} className="card">
+            <strong>Email Response:</strong>
+            <pre style={{ whiteSpace: 'pre-wrap' }}>{draftResponse}</pre>
+          </div>
+        )}
       </div>
-      {loadingDraft && <p>Thinking...</p>}
-      {draftResponse && (
-        <div style={{ marginBottom: 20, backgroundColor: '#1a1a1a', padding: 10 }}>
-          <strong>Email Response:</strong>
-          <pre style={{ whiteSpace: 'pre-wrap' }}>{draftResponse}</pre>
-        </div>
-      )}
     </div>
   )
 }

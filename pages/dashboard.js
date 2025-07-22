@@ -118,8 +118,8 @@ export default function Dashboard() {
   const COLORS = ['#5ec2f7', '#a6e3e9', '#f9a826', '#82ca9d', '#8884d8']
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1 style={{ color: '#5ec2f7' }}>Dashboard</h1>
+    <div className="content">
+      <h1 style={{ color: 'var(--accent)' }}>Dashboard</h1>
       {error && <p>{error}</p>}
       <div style={{ marginBottom: 10 }}>
         <label style={{ marginRight: '1rem' }}>
@@ -131,17 +131,17 @@ export default function Dashboard() {
         </label>
       </div>
       {view === 'merchants' && (
-        <>
+        <div className="card">
           <p>Total retailers: {totalRetailers}</p>
           <p>Average cashback: {avgCashback.toFixed(2)}</p>
-        </>
+        </div>
       )}
       {view === 'publishers' && (
         <p>Total reach: {totalReach.toLocaleString()}</p>
       )}
 
       {view === 'merchants' && (
-        <>
+        <div className="card">
           <h3>Retailers by Region</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={regionData}>
@@ -173,11 +173,11 @@ export default function Dashboard() {
               <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
-        </>
+        </div>
       )}
 
       {view === 'publishers' && (
-        <>
+        <div className="card">
           <h3>Reach by Publisher</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={reachData}>
@@ -227,7 +227,7 @@ export default function Dashboard() {
               <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
-        </>
+        </div>
       )}
     </div>
   )

@@ -1,15 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+:root {
+  --primary: #163165;
+  --accent: #22A1F7;
+  --bg-light: #F7F8FA;
+  --bg-dark: #010A1A;
+  --text-dark: #010A1A;
+  --text-light: #ffffff;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background: #0a0a0a;
-  color: #fff;
-  font-family: Arial, sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+  transition: background 0.3s, color 0.3s;
 }
+
 a {
   text-decoration: none;
 }
 
-body.light-mode {
-  background: #fff;
-  color: #000;
+body.dark-mode {
+  background: var(--bg-dark);
+  color: var(--text-light);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--primary);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 24px rgba(22, 49, 101, 0.07);
+}
+
+.navbar a {
+  color: #fff;
+  margin-right: 1rem;
+}
+
+.navbar .spacer {
+  flex-grow: 1;
+}
+
+.logo {
+  font-weight: 600;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.content {
+  padding: 2rem;
+}
+
+.card {
+  background: rgba(255,255,255,0.85);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 24px rgba(22,49,101,0.07);
+  margin-bottom: 2rem;
+}
+
+body.dark-mode .card {
+  background: rgba(22,49,101,0.9);
+}
+
+body.dark-mode .navbar {
+  background: #021633;
 }

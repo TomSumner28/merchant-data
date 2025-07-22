@@ -50,23 +50,25 @@ export default function ExternalTools() {
     <ul>
       {items.map(({ name, url }) => (
         <li key={name}>
-          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: '#5ec2f7' }}>{name}</a>
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>{name}</a>
         </li>
       ))}
     </ul>
   );
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1 style={{ color: '#5ec2f7' }}>External Tools</h1>
-      <h2>Finance</h2>
-      {renderList(finance)}
-      <h2>Sales</h2>
-      {renderList(sales)}
-      <h2>Account Management</h2>
-      {renderList(accountManagement)}
-      <h2>Admin</h2>
-      {renderList(admin)}
+    <div className="content">
+      <div className="card">
+        <h1 style={{ color: 'var(--accent)' }}>External Tools</h1>
+        <h2>Finance</h2>
+        {renderList(finance)}
+        <h2>Sales</h2>
+        {renderList(sales)}
+        <h2>Account Management</h2>
+        {renderList(accountManagement)}
+        <h2>Admin</h2>
+        {renderList(admin)}
+      </div>
     </div>
   );
 }

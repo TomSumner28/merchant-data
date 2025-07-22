@@ -46,8 +46,9 @@ export default function TimeZoneTracker() {
     }).format(now)
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1 style={{ color: '#5ec2f7' }}>Time Zone Tracker</h1>
+    <div className="content">
+      <div className="card">
+        <h1 style={{ color: 'var(--accent)' }}>Time Zone Tracker</h1>
       <ul>
         {zones.map(({ label, timeZone }) => (
           <li key={label} style={{ marginBottom: 10 }}>
@@ -61,18 +62,19 @@ export default function TimeZoneTracker() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="What time is it in the UK if it's 14:30 in UTC timezone"
-          style={{ padding: 10, width: '100%' }}
+          style={{ padding: 10, width: '100%', borderRadius: 18, border: '1px solid var(--primary)' }}
         />
         <div style={{ marginTop: 10 }}>
-          <button onClick={handleAsk} style={{ padding: '10px 20px' }}>Ask</button>
+          <button onClick={handleAsk} style={{ padding: '10px 20px', background: 'var(--primary)', color: '#fff', borderRadius: 18 }}>Ask</button>
         </div>
       </div>
       {loading && <p>Thinking...</p>}
       {response && (
-        <div style={{ marginTop: 10, backgroundColor: '#1a1a1a', padding: 10 }}>
+        <div style={{ marginTop: 10 }} className="card">
           <pre style={{ whiteSpace: 'pre-wrap' }}>{response}</pre>
         </div>
       )}
+      </div>
     </div>
   )
 }
