@@ -277,7 +277,7 @@ export default function Dashboard() {
       {view === 'publishers' && (
         <div className="card">
           <h3>Publisher Targeting</h3>
-          <div style={{ marginBottom: '1rem' }}>
+          <div className="filter-group">
             <MultiSelect
               label="Regions"
               options={regionOptions}
@@ -286,35 +286,33 @@ export default function Dashboard() {
                 setTargetFilters({ ...targetFilters, regions: val })
               }
             />
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               Click To Activate:
               <select
                 value={targetFilters.click}
                 onChange={(e) =>
                   setTargetFilters({ ...targetFilters, click: e.target.value })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               Minimum/Maximum Spend:
               <select
                 value={targetFilters.minmax}
                 onChange={(e) =>
                   setTargetFilters({ ...targetFilters, minmax: e.target.value })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               New Customer Offer:
               <select
                 value={targetFilters.newCustomer}
@@ -324,14 +322,13 @@ export default function Dashboard() {
                     newCustomer: e.target.value,
                   })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               First Time Offer:
               <select
                 value={targetFilters.firstTime}
@@ -341,14 +338,13 @@ export default function Dashboard() {
                     firstTime: e.target.value,
                   })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               Budgets:
               <select
                 value={targetFilters.budgets}
@@ -358,14 +354,13 @@ export default function Dashboard() {
                     budgets: e.target.value,
                   })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               Refunds:
               <select
                 value={targetFilters.refunds}
@@ -375,21 +370,19 @@ export default function Dashboard() {
                     refunds: e.target.value,
                   })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label>
               Fixed Amount Offer:
               <select
                 value={targetFilters.fixed}
                 onChange={(e) =>
                   setTargetFilters({ ...targetFilters, fixed: e.target.value })
                 }
-                style={{ marginLeft: '0.5rem' }}
               >
                 <option value="">Any</option>
                 <option value="Yes">Yes</option>
@@ -436,21 +429,25 @@ export default function Dashboard() {
           </ResponsiveContainer>
 
           <h3>Payment Methods</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={paymentData} dataKey="count" nameKey="method" outerRadius={100} label>
-                {paymentData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(v) => v.toLocaleString()} />
-            </PieChart>
-          </ResponsiveContainer>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {paymentData.map((p) => (
-              <li key={p.method}>{p.method}: {p.count}</li>
-            ))}
-          </ul>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ flex: 1 }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie data={paymentData} dataKey="count" nameKey="method" outerRadius={100} label>
+                    {paymentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => v.toLocaleString()} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {paymentData.map((p) => (
+                <li key={p.method}>{p.method}: {p.count}</li>
+              ))}
+            </ul>
+          </div>
 
           <h3>Retailers by Sales Rep</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -508,8 +505,8 @@ export default function Dashboard() {
       {view === 'publishers' && (
         <div className="card">
           <h3>Reach by Publisher</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={reachData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
+          <ResponsiveContainer width="95%" height={250}>
+            <BarChart data={reachData} margin={{ top: 20, right: 30, left: 60, bottom: 20 }}>
               <XAxis dataKey="publisher" stroke="#ccc" tickMargin={10} />
               <YAxis stroke="#ccc" tickMargin={10} tickFormatter={(v) => v.toLocaleString()} />
               <Tooltip
@@ -537,8 +534,8 @@ export default function Dashboard() {
           </ResponsiveContainer>
 
           <h3>Reach by Region</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={regionReachData} margin={{ top: 20, right: 30, left: 40, bottom: 20 }}>
+          <ResponsiveContainer width="95%" height={250}>
+            <BarChart data={regionReachData} margin={{ top: 20, right: 30, left: 60, bottom: 20 }}>
               <XAxis dataKey="region" stroke="#ccc" tickMargin={10} />
               <YAxis stroke="#ccc" tickMargin={10} tickFormatter={(v) => v.toLocaleString()} />
               <Tooltip formatter={(v) => v.toLocaleString()} />
@@ -574,37 +571,6 @@ export default function Dashboard() {
             </ol>
           </div>
 
-          <h3>New Customer Offers</h3>
-          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <div style={{ flex: 1 }}>
-              <h4>Yes</h4>
-              <ul>
-                {newCustomerNames.Yes.map((name) => (
-                  <li key={name}>{name}</li>
-                ))}
-              </ul>
-            </div>
-            <div style={{ flex: 1 }}>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie data={newCustomerData} dataKey="reach" nameKey="type" outerRadius={100} label>
-                    {newCustomerData.map((entry, index) => (
-                      <Cell key={`cell-p-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v) => v.toLocaleString()} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-        <div style={{ flex: 1 }}>
-          <h4>No</h4>
-          <ul>
-            {newCustomerNames.No.map((name) => (
-              <li key={name}>{name}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
 
         </div>
       )}

@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 
 const zones = [
-  { label: 'Time Zone BST', timeZone: 'Europe/London' },
-  { label: 'Eastern Time (US)', timeZone: 'America/New_York' },
-  { label: 'Central Time (US)', timeZone: 'America/Chicago' },
-  { label: 'Mountain Time (US)', timeZone: 'America/Denver' },
-  { label: 'Pacific Time (US)', timeZone: 'America/Los_Angeles' },
-  { label: 'Alaska Time (US)', timeZone: 'America/Anchorage' },
-  { label: 'Hawaii Time (US)', timeZone: 'Pacific/Honolulu' },
-  { label: 'Atlantic Time (Canada)', timeZone: 'America/Halifax' },
-  { label: 'Newfoundland Time (Canada)', timeZone: 'America/St_Johns' }
+  { label: 'Time Zone BST', timeZone: 'Europe/London', abbr: 'BST' },
+  { label: 'Eastern Time (US)', timeZone: 'America/New_York', abbr: 'EST' },
+  { label: 'Central Time (US)', timeZone: 'America/Chicago', abbr: 'CST' },
+  { label: 'Mountain Time (US)', timeZone: 'America/Denver', abbr: 'MST' },
+  { label: 'Pacific Time (US)', timeZone: 'America/Los_Angeles', abbr: 'PST' },
+  { label: 'Alaska Time (US)', timeZone: 'America/Anchorage', abbr: 'AKST' },
+  { label: 'Hawaii Time (US)', timeZone: 'Pacific/Honolulu', abbr: 'HST' },
+  { label: 'Atlantic Time (Canada)', timeZone: 'America/Halifax', abbr: 'AST' },
+  { label: 'Newfoundland Time (Canada)', timeZone: 'America/St_Johns', abbr: 'NST' }
 ]
 
 export default function TimeZoneTracker() {
@@ -85,7 +85,7 @@ export default function TimeZoneTracker() {
             <tbody>
               {zones.map((z) => (
                 <tr key={z.label}>
-                  <td>{z.label}</td>
+                  <td>{z.label} ({z.abbr})</td>
                   {hours.map((h) => (
                     <td
                       key={h}

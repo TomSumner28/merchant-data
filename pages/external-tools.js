@@ -20,7 +20,7 @@ export default function ExternalTools() {
     { name: 'Flex Offers', url: 'https://www.flexoffers.com/' },
     { name: 'Partner Stack', url: 'https://partnerstack.com/' },
     { name: 'Everflow', url: 'https://www.everflow.io/' },
-    { name: 'Foxit', url: 'https://account.foxit.com/' },
+    { name: 'Foxit', url: 'https://eu1.foxitesign.foxit.com/home;jsessionid=D870DF25396B3767F01FF992515E36BA' },
     { name: 'Credit Safe', url: 'https://app.creditsafe.com/' }
   ];
   const accountManagement = [
