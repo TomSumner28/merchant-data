@@ -169,3 +169,19 @@ body.dark-mode .multi-select-toggle::after {
   display: flex;
   align-items: center;
 }
+
+@media (max-width: 600px) {
+  .navbar a {
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+  }
+  .navbar button {
+    font-size: 0.8rem;
+  }
+  .content {
+    padding: 1rem;
+  }
+  .card {
+    padding: 1rem;
+  }
+}

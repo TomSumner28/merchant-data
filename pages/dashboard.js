@@ -110,6 +110,7 @@ export default function Dashboard() {
 
   const reachByPub = {}
   const subPubsByPub = {}
+  const reachBySub = {}
   const newCustomerCounts = { Yes: 0, No: 0 }
   const newCustomerNames = { Yes: [], No: [] }
   const regionReach = {}
@@ -161,7 +162,12 @@ export default function Dashboard() {
       const reach = parseFloat(reachVal) || 0
       reachByPub[pub] = (reachByPub[pub] || 0) + reach
       if (!subPubsByPub[pub]) subPubsByPub[pub] = new Set()
-      sub.split(',').forEach((s) => s && subPubsByPub[pub].add(s.trim()))
+      sub.split(',').forEach((s) => {
+        const t = s.trim()
+        if (!t) return
+        subPubsByPub[pub].add(t)
+        reachBySub[t] = (reachBySub[t] || 0) + reach
+      })
 
       totalReach += reach
 
@@ -208,6 +214,11 @@ export default function Dashboard() {
     publisher,
     reach,
     subs: Array.from(subPubsByPub[publisher] || [])
+  })).sort((a, b) => b.reach - a.reach)
+
+  const subReachData = Object.entries(reachBySub).map(([sub, reach]) => ({
+    sub,
+    reach
   })).sort((a, b) => b.reach - a.reach)
 
   const regionReachData = ['UK', 'Europe', 'USA', 'Other']
@@ -507,7 +518,7 @@ export default function Dashboard() {
 
       {view === 'publishers' && (
         <div className="card">
-          <h3>Reach by Publisher</h3>
+          <h3>Reach by Network Publisher</h3>
           <ResponsiveContainer width="95%" height={250}>
             <BarChart data={reachData} margin={{ top: 20, right: 30, left: 60, bottom: 20 }}>
               <XAxis dataKey="publisher" stroke="#ccc" tickMargin={10} />
@@ -533,6 +544,16 @@ export default function Dashboard() {
                 }}
               />
               <Bar dataKey="reach" fill="#5ec2f7" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <h3>Reach by Sub-Publisher</h3>
+          <ResponsiveContainer width="95%" height={250}>
+            <BarChart data={subReachData} margin={{ top: 20, right: 30, left: 60, bottom: 20 }}>
+              <XAxis dataKey="sub" stroke="#ccc" tickMargin={10} />
+              <YAxis stroke="#ccc" tickMargin={10} tickFormatter={(v) => v.toLocaleString()} />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Bar dataKey="reach" fill="#a6e3e9" />
             </BarChart>
           </ResponsiveContainer>
 
