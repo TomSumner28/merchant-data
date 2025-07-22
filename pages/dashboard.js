@@ -67,7 +67,10 @@ export default function Dashboard() {
   let cashbackNum = 0
 
   const reachByPub = {}
+  const subPubsByPub = {}
   const newCustomerCounts = { Yes: 0, No: 0 }
+  const newCustomerNames = { Yes: [], No: [] }
+  const regionReach = {}
   let totalReach = 0
 
   if (view === 'merchants') {
@@ -111,13 +114,29 @@ export default function Dashboard() {
   } else {
     publishers.forEach((p) => {
       const pub = p["Network_Publishers"] || 'Unknown'
+      const sub = p["Sub_Publishers"] || ''
       const reachVal = (p["Reach"] || '').toString().replace(/,/g, '')
       const reach = parseFloat(reachVal) || 0
       reachByPub[pub] = (reachByPub[pub] || 0) + reach
+      if (!subPubsByPub[pub]) subPubsByPub[pub] = new Set()
+      sub.split(',').forEach((s) => s && subPubsByPub[pub].add(s.trim()))
+
       totalReach += reach
+
+      const regions = parseRegions(p["Regions"])
+      if (regions.length === 0) {
+        regionReach['Other'] = (regionReach['Other'] || 0) + reach
+      } else {
+        regions.forEach((r) => {
+          regionReach[r] = (regionReach[r] || 0) + reach
+        })
+      }
 
       const can = (p["New_Customers"] || '').toLowerCase().startsWith('y') ? 'Yes' : 'No'
       newCustomerCounts[can] = (newCustomerCounts[can] || 0) + reach
+      if (p["Network_Publishers"]) {
+        newCustomerNames[can].push(p["Network_Publishers"])
+      }
     })
   }
 
@@ -143,7 +162,16 @@ export default function Dashboard() {
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 10)
 
-  const reachData = Object.entries(reachByPub).map(([publisher, reach]) => ({ publisher, reach }))
+  const reachData = Object.entries(reachByPub).map(([publisher, reach]) => ({
+    publisher,
+    reach,
+    subs: Array.from(subPubsByPub[publisher] || [])
+  })).sort((a, b) => b.reach - a.reach)
+
+  const regionReachData = ['UK', 'Europe', 'USA', 'Other']
+    .map((r) => ({ region: r, reach: regionReach[r] || 0 }))
+    .filter((d) => d.reach > 0)
+
   const newCustomerData = Object.entries(newCustomerCounts).map(([type, reach]) => ({ type, reach }))
 
   const COLORS = ['#5ec2f7', '#a6e3e9', '#f9a826', '#82ca9d', '#8884d8']
@@ -271,8 +299,37 @@ export default function Dashboard() {
             <BarChart data={reachData}>
               <XAxis dataKey="publisher" stroke="#ccc" />
               <YAxis stroke="#ccc" />
-              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Tooltip
+                content={({ payload }) => {
+                  if (payload && payload.length) {
+                    const d = payload[0].payload
+                    return (
+                      <div className="tooltip">
+                        <strong>{d.publisher}</strong>: {d.reach.toLocaleString()}
+                        {d.subs.length > 0 && (
+                          <ul style={{ paddingLeft: '1rem' }}>
+                            {d.subs.map((s) => (
+                              <li key={s}>{s}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )
+                  }
+                  return null
+                }}
+              />
               <Bar dataKey="reach" fill="#5ec2f7" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <h3>Reach by Region</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={regionReachData}>
+              <XAxis dataKey="region" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip formatter={(v) => v.toLocaleString()} />
+              <Bar dataKey="reach" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
 
@@ -295,13 +352,13 @@ export default function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
+            <ol style={{ margin: 0, paddingLeft: '1.5rem', whiteSpace: 'nowrap' }}>
               {reachData.map((d) => (
-                <li key={d.publisher}>
+                <li key={d.publisher} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {d.publisher}: {d.reach.toLocaleString()} ({((d.reach / totalReach) * 100).toFixed(1)}%)
                 </li>
               ))}
-            </ul>
+            </ol>
           </div>
 
           <h3>New Customer Offers</h3>
@@ -315,6 +372,24 @@ export default function Dashboard() {
               <Tooltip formatter={(v) => v.toLocaleString()} />
             </PieChart>
           </ResponsiveContainer>
+          <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem' }}>
+            <div style={{ flex: 1 }}>
+              <h4>Yes</h4>
+              <ul>
+                {newCustomerNames.Yes.map((name) => (
+                  <li key={name}>{name}</li>
+                ))}
+              </ul>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h4>No</h4>
+              <ul>
+                {newCustomerNames.No.map((name) => (
+                  <li key={name}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
     </div>
