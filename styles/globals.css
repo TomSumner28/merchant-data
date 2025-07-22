@@ -74,48 +74,33 @@ body.dark-mode .navbar {
   background: #021633;
 }
 
-.timeline {
-  display: flex;
+
+/* Time zone tracker styles */
+.tz-scroll {
   overflow-x: auto;
+}
+
+.tz-table {
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.tz-table th,
+.tz-table td {
+  padding: 4px 8px;
   border: 1px solid var(--primary);
-  border-radius: 8px;
-}
-
-.hour-cell {
-  position: relative;
-  flex: 0 0 70px;
-  padding: 8px;
   text-align: center;
-  border-right: 1px solid var(--primary);
-  cursor: pointer;
 }
 
-.hour-cell:last-child {
-  border-right: none;
+.tz-table th {
+  background: var(--primary);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-.hour-cell.current {
+.highlight {
   background: var(--accent);
   color: #fff;
-}
-
-.tooltip {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--text-dark);
-  padding: 8px;
-  border: 1px solid var(--primary);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-  z-index: 10;
-}
-
-body.dark-mode .tooltip {
-  background: rgba(22, 49, 101, 0.9);
-  color: #fff;
-  border-color: var(--accent);
 }

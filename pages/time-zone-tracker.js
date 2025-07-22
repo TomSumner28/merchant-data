@@ -65,32 +65,41 @@ export default function TimeZoneTracker() {
     <div className="content">
       <div className="card">
         <h1 style={{ color: 'var(--accent)' }}>Time Zone Tracker</h1>
-        <div className="timeline">
-          {hours.map((h) => {
-            const base = londonDateAtHour(h)
-            const isCurrent = currentLondonHour() === h
-            return (
-              <div
-                key={h}
-                className={`hour-cell${isCurrent ? ' current' : ''}`}
-                onMouseEnter={() => setHoverHour(h)}
-                onMouseLeave={() => setHoverHour(null)}
-              >
-                {String(h).padStart(2, '0')}:00
-                {hoverHour === h && (
-                  <div className="tooltip">
-                    {zones
-                      .filter((z) => z.timeZone !== 'Europe/London')
-                      .map((z) => (
-                        <div key={z.label}>
-                          {z.label}: {formatTime(base, z.timeZone)}
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+        <div className="tz-scroll">
+          <table className="tz-table">
+            <thead>
+              <tr>
+                <th>Time Zone</th>
+                {hours.map((h) => (
+                  <th
+                    key={h}
+                    onMouseEnter={() => setHoverHour(h)}
+                    onMouseLeave={() => setHoverHour(null)}
+                    className={hoverHour === h ? 'highlight' : ''}
+                  >
+                    {String(h).padStart(2, '0')}:00
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {zones.map((z) => (
+                <tr key={z.label}>
+                  <td>{z.label}</td>
+                  {hours.map((h) => (
+                    <td
+                      key={h}
+                      className={hoverHour === h ? 'highlight' : ''}
+                      onMouseEnter={() => z.timeZone === 'Europe/London' && setHoverHour(h)}
+                      onMouseLeave={() => z.timeZone === 'Europe/London' && setHoverHour(null)}
+                    >
+                      {formatTime(londonDateAtHour(h), z.timeZone)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <div style={{ marginTop: 20 }}>
           <input
