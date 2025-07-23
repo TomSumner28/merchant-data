@@ -29,7 +29,7 @@ export default function RPFAutomation() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [isAM, setIsAM] = useState(false)
+  const [isAM, setIsAM] = useState(true)
   const [newMode, setNewMode] = useState(false)
   const [logo, setLogo] = useState(DEFAULT_LOGO)
 
@@ -264,7 +264,6 @@ useEffect(() => {
                     type="text"
                     value={form.rpf_name}
                     onChange={(e) => updateForm('rpf_name', e.target.value)}
-                    disabled={!isAM}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -276,7 +275,6 @@ useEffect(() => {
                     type="date"
                     value={form.go_live_date || ''}
                     onChange={(e) => updateForm('go_live_date', e.target.value)}
-                    disabled={!isAM}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -287,7 +285,6 @@ useEffect(() => {
                   <textarea
                     value={form.summary}
                     onChange={(e) => updateForm('summary', e.target.value)}
-                    disabled={!isAM}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -299,7 +296,6 @@ useEffect(() => {
                   <textarea
                     value={form.current_offers}
                     onChange={(e) => updateForm('current_offers', e.target.value)}
-                    disabled={!isAM}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -311,7 +307,6 @@ useEffect(() => {
                   <textarea
                     value={form.live_reward_programmes}
                     onChange={(e) => updateForm('live_reward_programmes', e.target.value)}
-                    disabled={!isAM}
                     rows={2}
                     style={{ width: '100%' }}
                   />
@@ -324,7 +319,6 @@ useEffect(() => {
                     type="text"
                     value={form.included_mids}
                     onChange={(e) => updateForm('included_mids', e.target.value)}
-                    disabled={!isAM}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -336,7 +330,6 @@ useEffect(() => {
                     type="text"
                     value={form.excluded_mids}
                     onChange={(e) => updateForm('excluded_mids', e.target.value)}
-                    disabled={!isAM}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -355,16 +348,12 @@ useEffect(() => {
                       <tr key={i}>
                         {Object.entries(row).map(([k, v]) => (
                           <td key={k}>
-                            {isAM ? (
-                              <textarea
-                                value={v}
-                                onChange={(e) => updateCell(i, k, e.target.value)}
-                                style={{ width: '100%' }}
-                                rows={3}
-                              />
-                            ) : (
-                              v
-                            )}
+                            <textarea
+                              value={v}
+                              onChange={(e) => updateCell(i, k, e.target.value)}
+                              style={{ width: '100%' }}
+                              rows={3}
+                            />
                           </td>
                         ))}
                       </tr>
@@ -376,9 +365,7 @@ useEffect(() => {
                 Add Row
               </button>
               <div style={{ marginTop: '1rem' }}>
-                {isAM && (
-                  <button onClick={saveRpf}>Save</button>
-                )}
+                <button onClick={saveRpf}>Save</button>
                 <button onClick={downloadPdf} style={{ marginLeft: '0.5rem' }}>
                   Download PDF
                 </button>
