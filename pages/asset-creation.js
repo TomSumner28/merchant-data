@@ -1,10 +1,15 @@
 import { useState } from 'react'
 
 const SIZES = [
-  { label: '300x250', w: 300, h: 250 },
+  { label: '500x500', w: 500, h: 500 },
   { label: '728x90', w: 728, h: 90 },
+  { label: '320x50', w: 320, h: 50 },
+  { label: '300x250', w: 300, h: 250 },
   { label: '160x600', w: 160, h: 600 },
-  { label: '600x600', w: 600, h: 600 }
+  { label: '1200x628', w: 1200, h: 628 },
+  { label: '600x200', w: 600, h: 200 },
+  { label: '128x128', w: 128, h: 128 },
+  { label: '32x32', w: 32, h: 32 }
 ]
 
 async function resizeImage(file, width, height) {
