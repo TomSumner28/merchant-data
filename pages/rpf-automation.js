@@ -139,7 +139,10 @@ useEffect(() => {
     }
     let res
     if (newMode) {
-      res = await supabase.from('rpf_forms').insert([{ ...base, version: 1 }]).select()
+      res = await supabase
+        .from('rpf_forms')
+        .insert([{ ...base, version: 1 }])
+        .select()
     } else if (selected) {
       res = await supabase
         .from('rpf_forms')
@@ -154,7 +157,7 @@ useEffect(() => {
       setSelected(res.data[0])
       setNewMode(false)
       alert('Saved')
-      handleSearch()
+      await handleSearch()
     }
   }
 
