@@ -64,11 +64,26 @@ export default function AssetCreation() {
 
       <div className="card">
         <h2>Single Image</h2>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setSingleFile(e.target.files[0])}
-        />
+        <div
+          className="drop-area"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files[0]) {
+              setSingleFile(e.dataTransfer.files[0]);
+            }
+          }}
+        >
+          <p>Drag & drop an image here or click to select</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setSingleFile(e.target.files[0])}
+            style={{ display: 'none' }}
+            id="single-input"
+          />
+          <label htmlFor="single-input" className="upload-btn">Browse</label>
+        </div>
         <div style={{ marginTop: '0.5rem' }}>
           <label>
             Size:
@@ -101,12 +116,26 @@ export default function AssetCreation() {
 
       <div className="card">
         <h2>Batch Upload</h2>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => setBatchFiles(Array.from(e.target.files))}
-        />
+        <div
+          className="drop-area"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length) setBatchFiles(files);
+          }}
+        >
+          <p>Drag & drop images here or click to select</p>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setBatchFiles(Array.from(e.target.files))}
+            style={{ display: 'none' }}
+            id="batch-input"
+          />
+          <label htmlFor="batch-input" className="upload-btn">Browse</label>
+        </div>
         <div style={{ marginTop: '0.5rem' }}>
           <label>
             Size:
