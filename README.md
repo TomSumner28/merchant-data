@@ -60,6 +60,8 @@ The Draft Reply feature pulls the same Supabase context as Ask TRC so email answ
 
 The homepage also shows a **Weekly Company Update**. Admins can enter bullet points at the bottom of the page and click *Generate Update* to produce a CEO-style summary. Provide bullet points for each department (Company, Operations, Sales and Finance) and the AI will convert them into a well‑written paragraph per department. The latest update is saved in `localStorage` and displayed at the top of the page.
 
+The **Asset Creation** page lets you resize images for different publisher specifications. Upload a single file or a batch of images, choose a preset size and download the resized results. Processing happens in the browser so you can quickly create banners in common dimensions.
+
 ## Semantic Queries
 
 When you ask questions like "How many retailers are active in the United States?" the API
