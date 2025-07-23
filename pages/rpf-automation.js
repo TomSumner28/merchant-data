@@ -21,7 +21,6 @@ export default function RPFAutomation() {
   const [form, setForm] = useState({
     rpf_name: '',
     go_live_date: '',
-    summary: '',
     current_offers: '',
     live_reward_programmes: '',
     included_mids: '',
@@ -83,7 +82,6 @@ useEffect(() => {
     setForm({
       rpf_name: r.rpf_name || '',
       go_live_date: r.go_live_date || '',
-      summary: r.summary || '',
       current_offers: r.current_offers || '',
       live_reward_programmes: r.live_reward_programmes || '',
       included_mids: r.included_mids || '',
@@ -106,7 +104,7 @@ useEffect(() => {
     const cols = tableRows[0] ? Object.keys(tableRows[0]) : defaultColumns
     const row = {}
     cols.forEach(c => {
-      row[c] = ''
+      row[c] = c === 'offer_period' ? 'No end date' : ''
     })
     setTableRows([...tableRows, row])
   }
@@ -117,13 +115,16 @@ useEffect(() => {
     setForm({
       rpf_name: '',
       go_live_date: '',
-      summary: '',
       current_offers: '',
       live_reward_programmes: '',
       included_mids: '',
       excluded_mids: ''
     })
-    setTableRows([{ ...defaultColumns.reduce((a,c)=>{a[c]='';return a}, {}) }])
+    const baseRow = defaultColumns.reduce((a, c) => {
+      a[c] = c === 'offer_period' ? 'No end date' : ''
+      return a
+    }, {})
+    setTableRows([baseRow])
   }
 
   async function saveRpf() {
@@ -183,7 +184,6 @@ useEffect(() => {
       doc.text(introLines, 10, y)
       y += introLines.length * 6 + 4
       const info = [
-        ['Summary', form.summary],
         ['Current Offer(s)', form.current_offers],
         ['Live Reward Programmes', form.live_reward_programmes],
         ['Included MIDs/Descriptors', form.included_mids],
@@ -280,17 +280,6 @@ useEffect(() => {
                     value={form.go_live_date || ''}
                     onChange={(e) => updateForm('go_live_date', e.target.value)}
                     style={{ marginLeft: 8 }}
-                  />
-                </label>
-              </div>
-              <div>
-                <label>
-                  Summary:
-                  <textarea
-                    value={form.summary}
-                    onChange={(e) => updateForm('summary', e.target.value)}
-                    rows={3}
-                    style={{ width: '100%' }}
                   />
                 </label>
               </div>
