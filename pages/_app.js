@@ -16,6 +16,7 @@ function MyApp({ Component, pageProps }) {
   }, [darkMode])
 
   const [amOpen, setAmOpen] = useState(false)
+  const [salesOpen, setSalesOpen] = useState(false)
 
   return (
     <>
@@ -23,16 +24,24 @@ function MyApp({ Component, pageProps }) {
         <span className="logo">TRC</span>
         <Link href="/">Home</Link>
         <Link href="/dashboard">Dashboard</Link>
-        <a href="https://forecasting.therewardcollection.com" target="_blank" rel="noopener noreferrer">Forecasting</a>
-        <Link href="/asset-creation">Asset Creation</Link>
-        <Link href="/external-tools">External Tools</Link>
-        <Link href="/time-zone-tracker">Time Zone Tracker</Link>
         <div className="dropdown">
+          <button onClick={() => setSalesOpen(!salesOpen)} className="dropbtn">Sales ▾</button>
+          {salesOpen && (
+            <div className="dropdown-menu">
+              <Link href="/sales">Sales Home</Link>
+              <a href="https://forecasting.therewardcollection.com" target="_blank" rel="noopener noreferrer">Forecasting</a>
+            </div>
+          )}
+        </div>
+       <Link href="/external-tools">External Tools</Link>
+       <Link href="/time-zone-tracker">Time Zone Tracker</Link>
+       <div className="dropdown">
           <button onClick={() => setAmOpen(!amOpen)} className="dropbtn">Account Manager ▾</button>
           {amOpen && (
             <div className="dropdown-menu">
-              <Link href="/automation-approvals">Automation Approvals</Link>
+              <Link href="/approval-automation">Approval Automation</Link>
               <Link href="/rpf-automation">RPF Automation</Link>
+              <Link href="/asset-creation">Asset Creation</Link>
             </div>
           )}
         </div>
