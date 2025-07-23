@@ -205,6 +205,11 @@ export default function RPFAutomation() {
   return (
     <div className="content">
       <h1 style={{ color: 'var(--accent)' }}>RPF Automation</h1>
+      {isAM && (
+        <button onClick={newRpf} style={{ float: 'right', marginTop: '-2.5rem' }}>
+          Create New RPF
+        </button>
+      )}
       {!supabase && <p>Supabase not configured</p>}
       {supabase && (
         <>
@@ -217,11 +222,6 @@ export default function RPFAutomation() {
               style={{ flex: 1, padding: 8, borderRadius: 8 }}
             />
             <button onClick={handleSearch}>Search</button>
-            {isAM && (
-              <button onClick={newRpf} style={{ marginLeft: 'auto' }}>
-                Create New RPF
-              </button>
-            )}
           </div>
           {loading && <p>Loading...</p>}
           {results.map((r) => (

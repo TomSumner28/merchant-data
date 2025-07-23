@@ -56,13 +56,14 @@ policy questions it searches the `knowledge_base_entries` table and includes the
 most relevant passages along with file details like name, URL and type.
 
 The home page includes a persistent Ask TRC chat where each question and answer is stored in a conversation history (saved to `localStorage`) that you can collapse or reset. Below the chat is the Draft Reply tool which generates email responses. Use the **Tone Enhancer** dropdown to tailor the reply for roles such as Sales, Account Manager or Legal.
+To test editing capabilities like creating new RPFs, set `localStorage.setItem('role', 'Account Manager')` in your browser so the page recognises you as an AM.
 The Draft Reply feature pulls the same Supabase context as Ask TRC so email answers can cite merchant records or contract clauses when relevant.
 
 The homepage also shows a **Weekly Company Update**. Admins can enter bullet points at the bottom of the page and click *Generate Update* to produce a CEO-style summary. Provide bullet points for each department (Company, Operations, Sales and Finance) and the AI will convert them into a well‑written paragraph per department. The latest update is saved in `localStorage` and displayed at the top of the page.
 
 The **Asset Creation** page lets you resize images for different publisher specifications. Drag and drop files or use the file picker for single or batch uploads, choose a preset size and download the resized results. Images are resampled with high-quality smoothing so the resized banners stay sharp and free from pixelation. All processing happens in the browser so you can quickly create banners in common dimensions.
 
-The **RPF Automation** page lets Account Managers manage Reward Programme Forms stored in the `rpf_forms` table. Use **Create New RPF** to start a blank form for a brand that doesn’t yet exist. Search by name or ID to edit an existing record. AMs can edit any cell, append rows and click **Save** to either insert a new row or update an existing one. Each save increments the version and records the user’s email. A **Download PDF** button exports a branded PDF including the TRC logo and official wording.
+The **RPF Automation** page lets Account Managers manage Reward Programme Forms stored in the `rpf_forms` table. Use **Create New RPF** at the top of the page to start a blank form for a brand that doesn’t yet exist. Search by name or ID to edit an existing record. Within a form AMs can click **Add Row** to append table rows and edit any cell before hitting **Save** to insert or update the record. Each save increments the version and records the user’s email. A **Download PDF** button exports a branded PDF including the TRC logo and official wording.
 
 ## Semantic Queries
 
