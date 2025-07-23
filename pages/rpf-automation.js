@@ -205,15 +205,10 @@ export default function RPFAutomation() {
   return (
     <div className="content">
       <h1 style={{ color: 'var(--accent)' }}>RPF Automation</h1>
-      {isAM && (
-        <button onClick={newRpf} style={{ float: 'right', marginTop: '-2.5rem' }}>
-          Create New RPF
-        </button>
-      )}
       {!supabase && <p>Supabase not configured</p>}
       {supabase && (
         <>
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <input
               type="text"
               value={search}
@@ -223,6 +218,11 @@ export default function RPFAutomation() {
             />
             <button onClick={handleSearch}>Search</button>
           </div>
+          {isAM && (
+            <button onClick={newRpf} style={{ marginBottom: '1rem' }}>
+              Create New RPF
+            </button>
+          )}
           {loading && <p>Loading...</p>}
           {results.map((r) => (
             <div
@@ -234,7 +234,7 @@ export default function RPFAutomation() {
             </div>
           ))}
           {selected && (
-            <div className="card" style={{ marginTop: '1rem' }}>
+            <div className="card rpf-form" style={{ marginTop: '1rem' }}>
               <h2>{form.rpf_name}</h2>
               <div>
                 <label>
@@ -321,7 +321,7 @@ export default function RPFAutomation() {
                 </label>
               </div>
               {tableRows.length > 0 && (
-                <table className="tz-table" style={{ marginTop: '1rem', width: '100%' }}>
+                <table className="rpf-table" style={{ marginTop: '1rem', width: '100%' }}>
                   <thead>
                     <tr>
                       {Object.keys(tableRows[0]).map((c) => (

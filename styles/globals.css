@@ -142,6 +142,37 @@ body.dark-mode .navbar {
   z-index: 1;
 }
 
+/* RPF form styles */
+.rpf-form label {
+  display: block;
+  margin: 0.5rem 0;
+  font-weight: 600;
+}
+
+.rpf-form input,
+.rpf-form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+  margin-top: 0.25rem;
+}
+
+.rpf-table {
+  border-collapse: collapse;
+}
+
+.rpf-table th,
+.rpf-table td {
+  border: 1px solid var(--primary);
+  padding: 4px 8px;
+}
+
+.rpf-table th {
+  background: var(--primary);
+  color: #fff;
+}
+
 body.dark-mode .tz-table td:first-child {
   background: var(--bg-dark);
 }

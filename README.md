@@ -63,7 +63,7 @@ The homepage also shows a **Weekly Company Update**. Admins can enter bullet poi
 
 The **Asset Creation** page lets you resize images for different publisher specifications. Drag and drop files or use the file picker for single or batch uploads, choose a preset size and download the resized results. Images are resampled with high-quality smoothing so the resized banners stay sharp and free from pixelation. All processing happens in the browser so you can quickly create banners in common dimensions.
 
-The **RPF Automation** page lets Account Managers manage Reward Programme Forms stored in the `rpf_forms` table. Use **Create New RPF** at the top of the page to start a blank form for a brand that doesn’t yet exist. Search by name or ID to edit an existing record. Within a form AMs can click **Add Row** to append table rows and edit any cell before hitting **Save** to insert or update the record. Each save increments the version and records the user’s email. A **Download PDF** button exports a branded PDF including the TRC logo and official wording.
+The **RPF Automation** page lets Account Managers manage Reward Programme Forms stored in the `rpf_forms` table. After searching you can click **Create New RPF** below the search bar to start a blank form for a brand that doesn’t yet exist. Within a form AMs can click **Add Row** under the table to append more lines and edit any cell before hitting **Save** to insert or update the record. Each save increments the version and records the user’s email. A **Download PDF** button exports a branded PDF including the TRC logo and official wording.
 
 ## Semantic Queries
 
