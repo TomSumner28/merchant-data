@@ -133,6 +133,7 @@ useEffect(() => {
       typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
     const base = {
       ...form,
+      go_live_date: form.go_live_date || null,
       table_data: tableRows,
       updated_at: new Date().toISOString(),
       last_updated_by: email
@@ -152,7 +153,7 @@ useEffect(() => {
     }
     if (res && res.error) {
       console.error('save error', res.error)
-      alert('Failed to save')
+      alert('Failed to save: ' + res.error.message)
     } else if (res && res.data && res.data[0]) {
       setSelected(res.data[0])
       setNewMode(false)
