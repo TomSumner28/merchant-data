@@ -62,15 +62,19 @@ body.dark-mode {
 }
 
 .dropdown-menu {
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;
   background: var(--primary);
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  display: flex;
   flex-direction: column;
   white-space: nowrap;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: flex;
 }
 
 .dropdown-menu a {

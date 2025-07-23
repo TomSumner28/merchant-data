@@ -245,7 +245,7 @@ export default function RPFAutomation() {
                     type="text"
                     value={form.rpf_name}
                     onChange={(e) => updateForm('rpf_name', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -257,7 +257,7 @@ export default function RPFAutomation() {
                     type="date"
                     value={form.go_live_date || ''}
                     onChange={(e) => updateForm('go_live_date', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -268,7 +268,7 @@ export default function RPFAutomation() {
                   <textarea
                     value={form.summary}
                     onChange={(e) => updateForm('summary', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -280,7 +280,7 @@ export default function RPFAutomation() {
                   <textarea
                     value={form.current_offers}
                     onChange={(e) => updateForm('current_offers', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -292,7 +292,7 @@ export default function RPFAutomation() {
                   <textarea
                     value={form.live_reward_programmes}
                     onChange={(e) => updateForm('live_reward_programmes', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     rows={2}
                     style={{ width: '100%' }}
                   />
@@ -305,7 +305,7 @@ export default function RPFAutomation() {
                     type="text"
                     value={form.included_mids}
                     onChange={(e) => updateForm('included_mids', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -317,7 +317,7 @@ export default function RPFAutomation() {
                     type="text"
                     value={form.excluded_mids}
                     onChange={(e) => updateForm('excluded_mids', e.target.value)}
-                    disabled={!isAM}
+                    disabled={!isAM && !newMode}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -356,7 +356,7 @@ export default function RPFAutomation() {
                 Add Row
               </button>
               <div style={{ marginTop: '1rem' }}>
-                {isAM && (
+                {(isAM || newMode) && (
                   <button onClick={saveRpf}>Save</button>
                 )}
                 <button onClick={downloadPdf} style={{ marginLeft: '0.5rem' }}>

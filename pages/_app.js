@@ -15,8 +15,6 @@ function MyApp({ Component, pageProps }) {
     localStorage.setItem('darkMode', darkMode)
   }, [darkMode])
 
-  const [amOpen, setAmOpen] = useState(false)
-  const [salesOpen, setSalesOpen] = useState(false)
 
   return (
     <>
@@ -25,26 +23,22 @@ function MyApp({ Component, pageProps }) {
         <Link href="/">Home</Link>
         <Link href="/dashboard">Dashboard</Link>
         <div className="dropdown">
-          <button onClick={() => setSalesOpen(!salesOpen)} className="dropbtn">Sales ▾</button>
-          {salesOpen && (
-            <div className="dropdown-menu">
-              <Link href="/sales">Sales Home</Link>
-              <a href="https://forecasting.therewardcollection.com" target="_blank" rel="noopener noreferrer">Forecasting</a>
-            </div>
-          )}
+          <span className="dropbtn">Account Manager ▾</span>
+          <div className="dropdown-menu">
+            <Link href="/approval-automation">Approval Automation</Link>
+            <Link href="/rpf-automation">RPF Automation</Link>
+            <Link href="/asset-creation">Asset Creation</Link>
+          </div>
+        </div>
+        <div className="dropdown">
+          <span className="dropbtn">Sales ▾</span>
+          <div className="dropdown-menu">
+            <Link href="/sales">Sales Home</Link>
+            <a href="https://forecasting.therewardcollection.com" target="_blank" rel="noopener noreferrer">Forecasting</a>
+          </div>
         </div>
        <Link href="/external-tools">External Tools</Link>
        <Link href="/time-zone-tracker">Time Zone Tracker</Link>
-       <div className="dropdown">
-          <button onClick={() => setAmOpen(!amOpen)} className="dropbtn">Account Manager ▾</button>
-          {amOpen && (
-            <div className="dropdown-menu">
-              <Link href="/approval-automation">Approval Automation</Link>
-              <Link href="/rpf-automation">RPF Automation</Link>
-              <Link href="/asset-creation">Asset Creation</Link>
-            </div>
-          )}
-        </div>
         <div className="spacer" />
         <button onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? 'Light Mode' : 'Dark Mode'}
