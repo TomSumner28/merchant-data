@@ -91,13 +91,29 @@ useEffect(() => {
   }
 
   function updateForm(field, value) {
-    setForm({ ...form, [field]: value })
+    setForm((f) => ({ ...f, [field]: value }))
+    if (selected && selected.id) {
+      setSelected({ ...selected, [field]: value })
+    }
   }
 
   function updateCell(i, key, value) {
     const rows = [...tableRows]
     rows[i] = { ...rows[i], [key]: value }
     setTableRows(rows)
+  }
+
+  async function saveField(field, value) {
+    if (!supabase || !selected?.id || newMode) return
+    const email =
+      typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
+    const { data, error } = await supabase
+      .from('rpf_forms')
+      .update({ [field]: value, updated_at: new Date().toISOString(), last_updated_by: email })
+      .eq('id', selected.id)
+      .select()
+      .single()
+    if (!error && data) setSelected(data)
   }
 
   function addRow() {
@@ -277,6 +293,7 @@ useEffect(() => {
                     type="text"
                     value={form.rpf_name}
                     onChange={(e) => updateForm('rpf_name', e.target.value)}
+                    onBlur={(e) => saveField('rpf_name', e.target.value)}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -288,6 +305,7 @@ useEffect(() => {
                     type="date"
                     value={form.go_live_date || ''}
                     onChange={(e) => updateForm('go_live_date', e.target.value)}
+                    onBlur={(e) => saveField('go_live_date', e.target.value)}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -298,6 +316,7 @@ useEffect(() => {
                   <textarea
                     value={form.current_offers}
                     onChange={(e) => updateForm('current_offers', e.target.value)}
+                    onBlur={(e) => saveField('current_offers', e.target.value)}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -309,6 +328,7 @@ useEffect(() => {
                   <textarea
                     value={form.live_reward_programmes}
                     onChange={(e) => updateForm('live_reward_programmes', e.target.value)}
+                    onBlur={(e) => saveField('live_reward_programmes', e.target.value)}
                     rows={2}
                     style={{ width: '100%' }}
                   />
@@ -321,6 +341,7 @@ useEffect(() => {
                     type="text"
                     value={form.included_mids}
                     onChange={(e) => updateForm('included_mids', e.target.value)}
+                    onBlur={(e) => saveField('included_mids', e.target.value)}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -332,6 +353,7 @@ useEffect(() => {
                     type="text"
                     value={form.excluded_mids}
                     onChange={(e) => updateForm('excluded_mids', e.target.value)}
+                    onBlur={(e) => saveField('excluded_mids', e.target.value)}
                     style={{ width: '100%' }}
                   />
                 </label>
