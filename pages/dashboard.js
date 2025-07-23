@@ -108,6 +108,7 @@ export default function Dashboard() {
   const tacticalCounts = { Always: 0, Tactical: 0 }
   const leadSourceCounts = {}
   let totalStores = 0
+  let activeStores = 0
   let cashbackSum = 0
   let cashbackNum = 0
 
@@ -151,7 +152,12 @@ export default function Dashboard() {
       leadSourceCounts[lead] = (leadSourceCounts[lead] || 0) + 1
 
       const stores = parseInt(m["No. of Stores"])
-      if (!isNaN(stores)) totalStores += stores
+      if (!isNaN(stores)) {
+        totalStores += stores
+        if ((m["Deal Stage"] || '').toLowerCase() !== 'lost') {
+          activeStores += stores
+        }
+      }
 
       const cb = parseFloat(m["New Cashback"])
       if (!isNaN(cb)) {
@@ -223,7 +229,10 @@ export default function Dashboard() {
     })
   })
 
-  const totalRetailers = merchants.length
+  const activeMerchants = merchants.filter(
+    (m) => (m["Deal Stage"] || '').toLowerCase() !== 'lost'
+  )
+  const totalRetailers = activeMerchants.length
   const avgCashback = cashbackNum ? cashbackSum / cashbackNum : 0
   const orderedRegions = ['UK', 'Europe', 'USA', 'Other']
   const regionData = orderedRegions
@@ -321,9 +330,9 @@ export default function Dashboard() {
       </div>
       {view === 'merchants' && (
         <div className="card">
-          <p>Total retailers: {totalRetailers}</p>
+          <p>Active merchants: {totalRetailers}</p>
           <p>Average cashback: {avgCashback.toFixed(2)}</p>
-          <p>Number of stores: {totalStores.toLocaleString()}</p>
+          <p>Number of stores: {activeStores.toLocaleString()}</p>
         </div>
       )}
       {view === 'publishers' && (
