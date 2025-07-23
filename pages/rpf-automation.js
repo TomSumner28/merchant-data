@@ -31,7 +31,6 @@ export default function RPFAutomation() {
   const [error, setError] = useState('')
   const [isAM, setIsAM] = useState(false)
   const [newMode, setNewMode] = useState(false)
-  const [editing, setEditing] = useState(false)
   const [logo, setLogo] = useState(DEFAULT_LOGO)
 
 useEffect(() => {
@@ -81,7 +80,6 @@ useEffect(() => {
   function selectRpf(r) {
     setSelected(r)
     setNewMode(false)
-    setEditing(false)
     setForm({
       rpf_name: r.rpf_name || '',
       go_live_date: r.go_live_date || '',
@@ -111,13 +109,11 @@ useEffect(() => {
       row[c] = ''
     })
     setTableRows([...tableRows, row])
-    setEditing(true)
   }
 
   function newRpf() {
     setSelected({})
     setNewMode(true)
-    setEditing(true)
     setForm({
       rpf_name: '',
       go_live_date: '',
@@ -157,7 +153,6 @@ useEffect(() => {
     } else if (res && res.data && res.data[0]) {
       setSelected(res.data[0])
       setNewMode(false)
-      setEditing(false)
       alert('Saved')
       handleSearch()
     }
@@ -360,7 +355,7 @@ useEffect(() => {
                       <tr key={i}>
                         {Object.entries(row).map(([k, v]) => (
                           <td key={k}>
-                            {isAM && editing ? (
+                            {isAM ? (
                               <textarea
                                 value={v}
                                 onChange={(e) => updateCell(i, k, e.target.value)}
