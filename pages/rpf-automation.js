@@ -172,6 +172,7 @@ useEffect(() => {
         .update({ ...base, version: (selected.version || 1) + 1 })
         .eq('id', selected.id)
         .select()
+        .single()
     }
     if (res && res.error) {
       console.error('save error', res.error)
@@ -179,6 +180,15 @@ useEffect(() => {
     } else if (res && res.data) {
       const row = Array.isArray(res.data) ? res.data[0] : res.data
       setSelected(row)
+      setForm({
+        rpf_name: row.rpf_name || '',
+        go_live_date: row.go_live_date || '',
+        current_offers: row.current_offers || '',
+        live_reward_programmes: row.live_reward_programmes || '',
+        included_mids: row.included_mids || '',
+        excluded_mids: row.excluded_mids || ''
+      })
+      setTableRows(Array.isArray(row.table_data) ? row.table_data : [])
       setNewMode(false)
       alert('RPF Saved')
       await handleSearch()

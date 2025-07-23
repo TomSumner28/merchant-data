@@ -43,7 +43,14 @@ function MyApp({ Component, pageProps }) {
         </div>
        <Link href="/external-tools">External Tools</Link>
        <Link href="/time-zone-tracker">Time Zone Tracker</Link>
-        <div className="spacer" />
+       <a
+         href="https://notetaker.therewardcollection.com"
+         target="_blank"
+         rel="noopener noreferrer"
+       >
+         Note Taker
+       </a>
+       <div className="spacer" />
         <button onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? 'Light Mode' : 'Dark Mode'}
         </button>
