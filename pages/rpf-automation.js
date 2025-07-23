@@ -109,6 +109,11 @@ useEffect(() => {
     setTableRows([...tableRows, row])
   }
 
+  function removeRow(idx) {
+    const rows = tableRows.filter((_, i) => i !== idx)
+    setTableRows(rows)
+  }
+
   function newRpf() {
     setSelected({})
     setNewMode(true)
@@ -162,6 +167,8 @@ useEffect(() => {
       setNewMode(false)
       alert('RPF Saved')
       await handleSearch()
+    } else {
+      alert('Save failed: no row updated')
     }
   }
 
@@ -336,6 +343,7 @@ useEffect(() => {
                       {Object.keys(tableRows[0]).map((c) => (
                         <th key={c}>{c}</th>
                       ))}
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -351,6 +359,9 @@ useEffect(() => {
                             />
                           </td>
                         ))}
+                        <td>
+                          <button onClick={() => removeRow(i)}>Remove</button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
