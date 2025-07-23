@@ -19,7 +19,11 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <nav className="navbar">
-        <span className="logo">TRC</span>
+        <img
+          src="https://hwglmudfkjctsdnyutsp.supabase.co/storage/v1/object/public/knowledge-base//TRC%20Logo.png"
+          alt="The Reward Collection"
+          className="logo"
+        />
         <Link href="/">Home</Link>
         <Link href="/dashboard">Dashboard</Link>
         <div className="dropdown">
