@@ -31,6 +31,7 @@ export default function RPFAutomation() {
   const [error, setError] = useState('')
   const [isAM, setIsAM] = useState(false)
   const [newMode, setNewMode] = useState(false)
+  const [editing, setEditing] = useState(false)
 
   useEffect(() => {
     const role = typeof window !== 'undefined' ? localStorage.getItem('role') : ''
@@ -65,6 +66,7 @@ export default function RPFAutomation() {
   function selectRpf(r) {
     setSelected(r)
     setNewMode(false)
+    setEditing(false)
     setForm({
       rpf_name: r.rpf_name || '',
       go_live_date: r.go_live_date || '',
@@ -94,11 +96,13 @@ export default function RPFAutomation() {
       row[c] = ''
     })
     setTableRows([...tableRows, row])
+    setEditing(true)
   }
 
   function newRpf() {
     setSelected({})
     setNewMode(true)
+    setEditing(true)
     setForm({
       rpf_name: '',
       go_live_date: '',
@@ -138,6 +142,7 @@ export default function RPFAutomation() {
     } else if (res && res.data && res.data[0]) {
       setSelected(res.data[0])
       setNewMode(false)
+      setEditing(false)
       alert('Saved')
       handleSearch()
     }
@@ -146,57 +151,61 @@ export default function RPFAutomation() {
   function downloadPdf() {
     try {
       const doc = new jsPDF()
-      doc.addImage(TRC_LOGO, 'SVG', 10, 10, 30, 12)
-    let y = 26
-    const today = new Date().toLocaleDateString()
-    doc.setFontSize(16)
-    doc.text(`${form.rpf_name} Reward Programme`, 50, 14)
-    doc.setFontSize(12)
-    doc.text(`Reward Programme Form dated ${today}`, 50, 20)
-    doc.text(`Go Live Date: ${form.go_live_date || ''}`, 50, 26)
-    const intro =
-      'This Reward Programme Form is subject to the terms and conditions of the Master General Service Agreement (MGSA) available at https://therewardcollection.com/master-general-service-agreement/ and the terms and conditions of the Insertion Order entered into by and between The Reward Collection Ltd and the Retail Partner (together, the "Agreement"), effective as of the Effective Date. This Reward Programme Form is subject to change from time to time. The company will issue the Retail Partner with a new Reward Programme Form each time any changes are made. The revised Reward Programme Form shall form part of the Agreement between the parties.'
-    const introLines = doc.splitTextToSize(intro, 180)
-    doc.text(introLines, 10, y)
-    y += introLines.length * 6 + 4
-    const info = [
-      ['Summary', form.summary],
-      ['Current Offer(s)', form.current_offers],
-      ['Live Reward Programmes', form.live_reward_programmes],
-      ['Included MIDs/Descriptors', form.included_mids],
-      ['Excluded MIDs/Descriptors', form.excluded_mids]
-    ]
-    info.forEach(([label, text]) => {
-      doc.text(`${label}:`, 10, y)
-      const lines = doc.splitTextToSize(text || '', 180)
-      doc.text(lines, 10, y + 6)
-      y += lines.length * 6 + 10
-    })
-    if (tableRows.length) {
-      const headers = [
-        [
-          'Reward Programme',
-          'Commission',
-          'Offer Period',
-          'MIDs / Descriptors',
-          'Comments'
-        ]
+      try {
+        doc.addImage(TRC_LOGO, 'PNG', 10, 10, 30, 12)
+      } catch (e) {
+        console.warn('logo failed', e)
+      }
+      let y = 26
+      const today = new Date().toLocaleDateString()
+      doc.setFontSize(16)
+      doc.text(`${form.rpf_name} Reward Programme`, 50, 14)
+      doc.setFontSize(12)
+      doc.text(`Reward Programme Form dated ${today}`, 50, 20)
+      doc.text(`Go Live Date: ${form.go_live_date || ''}`, 50, 26)
+      const intro =
+        'This Reward Programme Form is subject to the terms and conditions of the Master General Service Agreement (MGSA) available at https://therewardcollection.com/master-general-service-agreement/ and the terms and conditions of the Insertion Order entered into by and between The Reward Collection Ltd and the Retail Partner (together, the "Agreement"), effective as of the Effective Date. This Reward Programme Form is subject to change from time to time. The company will issue the Retail Partner with a new Reward Programme Form each time any changes are made. The revised Reward Programme Form shall form part of the Agreement between the parties.'
+      const introLines = doc.splitTextToSize(intro, 180)
+      doc.text(introLines, 10, y)
+      y += introLines.length * 6 + 4
+      const info = [
+        ['Summary', form.summary],
+        ['Current Offer(s)', form.current_offers],
+        ['Live Reward Programmes', form.live_reward_programmes],
+        ['Included MIDs/Descriptors', form.included_mids],
+        ['Excluded MIDs/Descriptors', form.excluded_mids]
       ]
-      const data = tableRows.map((r) => [
-        r.reward_programme || '',
-        r.commission || '',
-        r.offer_period || '',
-        r.mids_descriptors || '',
-        r.comments || ''
-      ])
-      autoTable(doc, {
-        head: headers,
-        body: data,
-        startY: y,
-        headStyles: { fillColor: [22, 49, 101], textColor: 255 },
-        alternateRowStyles: { fillColor: [245, 245, 245] }
+      info.forEach(([label, text]) => {
+        doc.text(`${label}:`, 10, y)
+        const lines = doc.splitTextToSize(text || '', 180)
+        doc.text(lines, 10, y + 6)
+        y += lines.length * 6 + 10
       })
-    }
+      if (tableRows.length) {
+        const headers = [
+          [
+            'Reward Programme',
+            'Commission',
+            'Offer Period',
+            'MIDs / Descriptors',
+            'Comments'
+          ]
+        ]
+        const data = tableRows.map((r) => [
+          r.reward_programme || '',
+          r.commission || '',
+          r.offer_period || '',
+          r.mids_descriptors || '',
+          r.comments || ''
+        ])
+        autoTable(doc, {
+          head: headers,
+          body: data,
+          startY: y,
+          headStyles: { fillColor: [22, 49, 101], textColor: 255 },
+          alternateRowStyles: { fillColor: [245, 245, 245] }
+        })
+      }
       doc.save(`${form.rpf_name || 'rpf'}.pdf`)
     } catch (err) {
       console.error('PDF error', err)
@@ -245,7 +254,7 @@ export default function RPFAutomation() {
                     type="text"
                     value={form.rpf_name}
                     onChange={(e) => updateForm('rpf_name', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -257,7 +266,7 @@ export default function RPFAutomation() {
                     type="date"
                     value={form.go_live_date || ''}
                     onChange={(e) => updateForm('go_live_date', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -268,7 +277,7 @@ export default function RPFAutomation() {
                   <textarea
                     value={form.summary}
                     onChange={(e) => updateForm('summary', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -280,7 +289,7 @@ export default function RPFAutomation() {
                   <textarea
                     value={form.current_offers}
                     onChange={(e) => updateForm('current_offers', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -292,7 +301,7 @@ export default function RPFAutomation() {
                   <textarea
                     value={form.live_reward_programmes}
                     onChange={(e) => updateForm('live_reward_programmes', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     rows={2}
                     style={{ width: '100%' }}
                   />
@@ -305,7 +314,7 @@ export default function RPFAutomation() {
                     type="text"
                     value={form.included_mids}
                     onChange={(e) => updateForm('included_mids', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -317,7 +326,7 @@ export default function RPFAutomation() {
                     type="text"
                     value={form.excluded_mids}
                     onChange={(e) => updateForm('excluded_mids', e.target.value)}
-                    disabled={!isAM && !newMode}
+                    disabled={!isAM || !editing}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -336,7 +345,7 @@ export default function RPFAutomation() {
                       <tr key={i}>
                         {Object.entries(row).map(([k, v]) => (
                           <td key={k}>
-                            {isAM ? (
+                            {isAM && editing ? (
                               <input
                                 value={v}
                                 onChange={(e) => updateCell(i, k, e.target.value)}
@@ -356,7 +365,7 @@ export default function RPFAutomation() {
                 Add Row
               </button>
               <div style={{ marginTop: '1rem' }}>
-                {(isAM || newMode) && (
+                {isAM && editing && (
                   <button onClick={saveRpf}>Save</button>
                 )}
                 <button onClick={downloadPdf} style={{ marginLeft: '0.5rem' }}>
