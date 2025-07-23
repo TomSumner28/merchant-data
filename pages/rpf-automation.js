@@ -112,8 +112,7 @@ useEffect(() => {
       .update({ [field]: value, updated_at: new Date().toISOString(), last_updated_by: email })
       .eq('id', selected.id)
       .select()
-      .single()
-    if (!error && data) setSelected(data)
+    if (!error && data && data.length) setSelected(data[0])
   }
 
   function addRow() {
@@ -155,6 +154,7 @@ useEffect(() => {
       typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
     const base = {
       ...form,
+      table_data: tableRows,
       go_live_date: form.go_live_date || null,
       updated_at: new Date().toISOString(),
       last_updated_by: email
@@ -172,13 +172,13 @@ useEffect(() => {
         .update({ ...base, version: (selected.version || 1) + 1 })
         .eq('id', selected.id)
         .select()
-        .single()
     }
     if (res && res.error) {
       console.error('save error', res.error)
       alert('Failed to save: ' + res.error.message)
     } else if (res && res.data) {
-      setSelected(res.data)
+      const row = Array.isArray(res.data) ? res.data[0] : res.data
+      setSelected(row)
       setNewMode(false)
       alert('RPF Saved')
       await handleSearch()
