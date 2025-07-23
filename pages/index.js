@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 
 export default function Home() {
+  const [weeklyUpdate, setWeeklyUpdate] = useState('')
+  const [updateInput, setUpdateInput] = useState('')
   const [chatInput, setChatInput] = useState('')
   const [chatHistory, setChatHistory] = useState([])
   const [collapsed, setCollapsed] = useState(false)
@@ -17,6 +19,11 @@ export default function Home() {
   }, [chatHistory, loadingChat])
 
   useEffect(() => {
+    const wu = localStorage.getItem('weeklyUpdate')
+    if (wu) setWeeklyUpdate(wu)
+  }, [])
+
+  useEffect(() => {
     const saved = localStorage.getItem('chatHistory')
     if (saved) {
       try {
@@ -28,6 +35,12 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory))
   }, [chatHistory])
+
+  useEffect(() => {
+    if (weeklyUpdate) {
+      localStorage.setItem('weeklyUpdate', weeklyUpdate)
+    }
+  }, [weeklyUpdate])
 
   const sendChat = async () => {
     if (!chatInput) return
@@ -61,8 +74,28 @@ export default function Home() {
     setLoadingDraft(false)
   }
 
+  const generateUpdate = async () => {
+    if (!updateInput) return
+    const res = await fetch('/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekly: true, query: updateInput })
+    })
+    const data = await res.json()
+    setWeeklyUpdate(data.result)
+    setUpdateInput('')
+  }
+
   return (
     <div className="content">
+      <div className="card" style={{ marginBottom: '1rem' }}>
+        <h2>Weekly Company Update</h2>
+        {weeklyUpdate ? (
+          <p style={{ whiteSpace: 'pre-wrap' }}>{weeklyUpdate}</p>
+        ) : (
+          <p>No update available.</p>
+        )}
+      </div>
       <div className="card">
         <h2 style={{ color: 'var(--accent)' }}>Ask TRC</h2>
         <div style={{ marginBottom: 10 }}>
@@ -125,6 +158,19 @@ export default function Home() {
             <pre style={{ whiteSpace: 'pre-wrap' }}>{draftResponse}</pre>
           </div>
         )}
+      </div>
+      <div className="card" style={{ marginTop: '1rem' }}>
+        <h3 style={{ color: 'var(--accent)' }}>Create Weekly Update</h3>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: 10 }}>
+          <textarea
+            value={updateInput}
+            onChange={(e) => setUpdateInput(e.target.value)}
+            placeholder="Enter bullet points"
+            rows={1}
+            style={{ flex: 1, padding: 10, borderRadius: 18, border: '1px solid var(--primary)', resize: 'vertical' }}
+          />
+          <button onClick={generateUpdate} style={{ padding: '10px 20px', background: 'var(--primary)', color: '#fff', borderRadius: 18 }}>Generate Update</button>
+        </div>
       </div>
     </div>
   )

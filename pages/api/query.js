@@ -69,9 +69,32 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { query, email, short, tone, history = [] } = req.body
+  const { query, email, short, tone, history = [], weekly } = req.body
 
   console.log('Received query:', query)
+
+  if (weekly) {
+    try {
+      const messages = [
+        { role: 'system', content: 'You are the CEO of The Reward Collection. Write a concise weekly company update summarizing the following bullet points.' },
+        { role: 'user', content: query }
+      ]
+      const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
+        model: 'gpt-3.5-turbo',
+        messages
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+      })
+      const result = openaiRes.data.choices[0].message.content.trim()
+      return res.status(200).json({ result })
+    } catch (err) {
+      console.error('weekly update error', err.response?.data || err.message)
+      return res.status(500).json({ result: 'Failed to generate update.' })
+    }
+  }
 
   try {
     let systemMessage = 'You are a helpful assistant. Use the merchants, publishers, live brands, and knowledge base details provided in the context when relevant. If the information is not in the context, respond with "This information is not available in our records."'
