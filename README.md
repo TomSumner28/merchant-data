@@ -62,6 +62,8 @@ The homepage also shows a **Weekly Company Update**. Admins can enter bullet poi
 
 The **Asset Creation** page lets you resize images for different publisher specifications. Drag and drop files or use the file picker for single or batch uploads, choose a preset size and download the resized results. Images are resampled with high-quality smoothing so the resized banners stay sharp and free from pixelation. All processing happens in the browser so you can quickly create banners in common dimensions.
 
+The **RPF Automation** page lets Account Managers search for Retailer Proposal Forms stored in the `rpf_forms` table. You can select an RPF by name or ID, edit the details and table rows, then save the updated record back to Supabase. A **Download PDF** button generates a PDF version of the form using the same layout as the official template.
+
 ## Semantic Queries
 
 When you ask questions like "How many retailers are active in the United States?" the API

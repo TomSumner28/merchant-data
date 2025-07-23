@@ -17,6 +17,8 @@
     "pdf-parse": "^1.1.1",
     "mammoth": "^1.4.25",
     "xlsx": "^0.18.5",
-    "tesseract.js": "^4.1.1"
+    "tesseract.js": "^4.1.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.0"
   }
 }
