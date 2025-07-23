@@ -3,6 +3,9 @@ import { supabase } from '../lib/supabaseClient'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
+const TRC_LOGO =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAxMjAgMzIiPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMzIiIGZpbGw9IndoaXRlIi8+CiAgPHRleHQgeD0iMCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzE2MzE2NSIgZm9udC13ZWlnaHQ9IjYwMCI+VFJDPC90ZXh0Pgo8L3N2Zz4K'
+
 export default function RPFAutomation() {
   const [search, setSearch] = useState('')
   const [results, setResults] = useState([])
@@ -27,6 +30,7 @@ export default function RPFAutomation() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isAM, setIsAM] = useState(false)
+  const [newMode, setNewMode] = useState(false)
 
   useEffect(() => {
     const role = typeof window !== 'undefined' ? localStorage.getItem('role') : ''
@@ -60,6 +64,7 @@ export default function RPFAutomation() {
 
   function selectRpf(r) {
     setSelected(r)
+    setNewMode(false)
     setForm({
       rpf_name: r.rpf_name || '',
       go_live_date: r.go_live_date || '',
@@ -91,42 +96,64 @@ export default function RPFAutomation() {
     setTableRows([...tableRows, row])
   }
 
+  function newRpf() {
+    setSelected({})
+    setNewMode(true)
+    setForm({
+      rpf_name: '',
+      go_live_date: '',
+      summary: '',
+      current_offers: '',
+      live_reward_programmes: '',
+      included_mids: '',
+      excluded_mids: ''
+    })
+    setTableRows([{ ...defaultColumns.reduce((a,c)=>{a[c]='';return a}, {}) }])
+  }
+
   async function saveRpf() {
-    if (!supabase || !selected) return
+    if (!supabase) return
     if (!form.rpf_name) { alert('RPF name required'); return }
     const email =
       typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
-    const updated = {
+    const base = {
       ...form,
       table_data: tableRows,
-      version: (selected.version || 1) + 1,
       updated_at: new Date().toISOString(),
       last_updated_by: email
     }
-    const { data, error } = await supabase
-      .from('rpf_forms')
-      .update(updated)
-      .eq('id', selected.id)
-      .select()
-    if (error) {
-      console.error('update error', error)
+    let res
+    if (newMode) {
+      res = await supabase.from('rpf_forms').insert([{ ...base, version: 1 }]).select()
+    } else if (selected) {
+      res = await supabase
+        .from('rpf_forms')
+        .update({ ...base, version: (selected.version || 1) + 1 })
+        .eq('id', selected.id)
+        .select()
+    }
+    if (res && res.error) {
+      console.error('save error', res.error)
       alert('Failed to save')
-    } else if (data && data[0]) {
-      setSelected(data[0])
+    } else if (res && res.data && res.data[0]) {
+      setSelected(res.data[0])
+      setNewMode(false)
       alert('Saved')
+      handleSearch()
     }
   }
 
   function downloadPdf() {
     if (!selected) return
     const doc = new jsPDF()
+    doc.addImage(TRC_LOGO, 'SVG', 10, 10, 30, 12)
+    let y = 26
     const today = new Date().toLocaleDateString()
     doc.setFontSize(16)
-    doc.text(`${form.rpf_name} Reward Programme`, 10, 10)
+    doc.text(`${form.rpf_name} Reward Programme`, 50, 14)
     doc.setFontSize(12)
-    doc.text(`Reward Programme Form dated ${today}`, 10, 18)
-    doc.text(`Go Live Date: ${form.go_live_date || ''}`, 10, 26)
-    let y = 34
+    doc.text(`Reward Programme Form dated ${today}`, 50, 20)
+    doc.text(`Go Live Date: ${form.go_live_date || ''}`, 50, 26)
     const intro =
       'This Reward Programme Form is subject to the terms and conditions of the Master General Service Agreement (MGSA) available at https://therewardcollection.com/master-general-service-agreement/ and the terms and conditions of the Insertion Order entered into by and between The Reward Collection Ltd and the Retail Partner (together, the "Agreement"), effective as of the Effective Date. This Reward Programme Form is subject to change from time to time. The company will issue the Retail Partner with a new Reward Programme Form each time any changes are made. The revised Reward Programme Form shall form part of the Agreement between the parties.'
     const introLines = doc.splitTextToSize(intro, 180)
@@ -190,6 +217,11 @@ export default function RPFAutomation() {
               style={{ flex: 1, padding: 8, borderRadius: 8 }}
             />
             <button onClick={handleSearch}>Search</button>
+            {isAM && (
+              <button onClick={newRpf} style={{ marginLeft: 'auto' }}>
+                Create New RPF
+              </button>
+            )}
           </div>
           {loading && <p>Loading...</p>}
           {results.map((r) => (
