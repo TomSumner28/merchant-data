@@ -269,7 +269,7 @@ useEffect(() => {
                     type="text"
                     value={form.rpf_name}
                     onChange={(e) => updateForm('rpf_name', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -281,7 +281,7 @@ useEffect(() => {
                     type="date"
                     value={form.go_live_date || ''}
                     onChange={(e) => updateForm('go_live_date', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     style={{ marginLeft: 8 }}
                   />
                 </label>
@@ -292,7 +292,7 @@ useEffect(() => {
                   <textarea
                     value={form.summary}
                     onChange={(e) => updateForm('summary', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -304,7 +304,7 @@ useEffect(() => {
                   <textarea
                     value={form.current_offers}
                     onChange={(e) => updateForm('current_offers', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     rows={3}
                     style={{ width: '100%' }}
                   />
@@ -316,7 +316,7 @@ useEffect(() => {
                   <textarea
                     value={form.live_reward_programmes}
                     onChange={(e) => updateForm('live_reward_programmes', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     rows={2}
                     style={{ width: '100%' }}
                   />
@@ -329,7 +329,7 @@ useEffect(() => {
                     type="text"
                     value={form.included_mids}
                     onChange={(e) => updateForm('included_mids', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -341,7 +341,7 @@ useEffect(() => {
                     type="text"
                     value={form.excluded_mids}
                     onChange={(e) => updateForm('excluded_mids', e.target.value)}
-                    disabled={!isAM || !editing}
+                    disabled={!isAM}
                     style={{ width: '100%' }}
                   />
                 </label>
@@ -361,10 +361,11 @@ useEffect(() => {
                         {Object.entries(row).map(([k, v]) => (
                           <td key={k}>
                             {isAM && editing ? (
-                              <input
+                              <textarea
                                 value={v}
                                 onChange={(e) => updateCell(i, k, e.target.value)}
                                 style={{ width: '100%' }}
+                                rows={3}
                               />
                             ) : (
                               v
@@ -380,7 +381,7 @@ useEffect(() => {
                 Add Row
               </button>
               <div style={{ marginTop: '1rem' }}>
-                {isAM && editing && (
+                {isAM && (
                   <button onClick={saveRpf}>Save</button>
                 )}
                 <button onClick={downloadPdf} style={{ marginLeft: '0.5rem' }}>
