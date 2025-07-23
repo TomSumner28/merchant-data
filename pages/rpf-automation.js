@@ -104,13 +104,13 @@ useEffect(() => {
   }
 
   async function saveField(field, value) {
-    if (!supabase || !selected?.rpf_name || newMode) return
+    if (!supabase || !selected?.id || newMode) return
     const email =
       typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
     const { data, error } = await supabase
       .from('rpf_forms')
       .update({ [field]: value, updated_at: new Date().toISOString(), last_updated_by: email })
-      .eq('rpf_name', selected.rpf_name)
+      .eq('id', selected.id)
       .select()
       .single()
     if (!error && data) setSelected(data)
@@ -166,11 +166,11 @@ useEffect(() => {
         .insert([{ ...base, version: 1 }])
         .select()
         .single()
-    } else if (selected && selected.rpf_name) {
+    } else if (selected && selected.id) {
       res = await supabase
         .from('rpf_forms')
         .update({ ...base, version: (selected.version || 1) + 1 })
-        .eq('rpf_name', selected.rpf_name)
+        .eq('id', selected.id)
         .select()
         .single()
     }
