@@ -145,18 +145,20 @@ useEffect(() => {
         .from('rpf_forms')
         .insert([{ ...base, version: 1 }])
         .select()
-    } else if (selected) {
+        .single()
+    } else if (selected && selected.id) {
       res = await supabase
         .from('rpf_forms')
         .update({ ...base, version: (selected.version || 1) + 1 })
         .eq('id', selected.id)
         .select()
+        .single()
     }
     if (res && res.error) {
       console.error('save error', res.error)
       alert('Failed to save: ' + res.error.message)
-    } else if (res && res.data && res.data[0]) {
-      setSelected(res.data[0])
+    } else if (res && res.data) {
+      setSelected(res.data)
       setNewMode(false)
       alert('RPF Saved')
       await handleSearch()
