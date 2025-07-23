@@ -76,7 +76,11 @@ export default async function handler(req, res) {
   if (weekly) {
     try {
       const messages = [
-        { role: 'system', content: 'You are the CEO of The Reward Collection. Write a concise weekly company update summarizing the following bullet points.' },
+        {
+          role: 'system',
+          content:
+            'You are the CEO of The Reward Collection. Using the provided bullet points, craft a polished weekly update with one well written paragraph for each department (Company, Operations, Sales, Finance). Group any remaining points under the best fitting department and omit empty sections.'
+        },
         { role: 'user', content: query }
       ]
       const openaiRes = await axios.post('https://api.openai.com/v1/chat/completions', {
