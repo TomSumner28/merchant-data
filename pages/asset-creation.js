@@ -13,17 +13,16 @@ const SIZES = [
 ]
 
 async function resizeImage(file, width, height) {
+  const bitmap = await createImageBitmap(file)
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+  ctx.drawImage(bitmap, 0, 0, width, height)
   return new Promise((resolve) => {
-    const img = new Image()
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0, width, height)
-      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.92)
-    }
-    img.src = URL.createObjectURL(file)
+    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.95)
   })
 }
 
