@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-const TRC_LOGO =
+const DEFAULT_LOGO =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAxMjAgMzIiPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMzIiIGZpbGw9IndoaXRlIi8+CiAgPHRleHQgeD0iMCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzE2MzE2NSIgZm9udC13ZWlnaHQ9IjYwMCI+VFJDPC90ZXh0Pgo8L3N2Zz4K'
 
 export default function RPFAutomation() {
@@ -32,11 +32,26 @@ export default function RPFAutomation() {
   const [isAM, setIsAM] = useState(false)
   const [newMode, setNewMode] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [logo, setLogo] = useState(DEFAULT_LOGO)
 
-  useEffect(() => {
-    const role = typeof window !== 'undefined' ? localStorage.getItem('role') : ''
-    if (role && role.toLowerCase().includes('account')) setIsAM(true)
-  }, [])
+useEffect(() => {
+  const role = typeof window !== 'undefined' ? localStorage.getItem('role') : ''
+  if (role && role.toLowerCase().includes('account')) setIsAM(true)
+  // Load official logo from Supabase if available
+  if (supabase) {
+    supabase.storage
+      .from('knowledge_base')
+      .download('TRC-Logo.png')
+      .then(({ data }) => {
+        if (data) {
+          const reader = new FileReader()
+          reader.onload = () => setLogo(reader.result)
+          reader.readAsDataURL(data)
+        }
+      })
+      .catch(() => {})
+  }
+}, [])
 
   async function handleSearch() {
     if (!supabase) {
@@ -152,7 +167,7 @@ export default function RPFAutomation() {
     try {
       const doc = new jsPDF()
       try {
-        doc.addImage(TRC_LOGO, 'PNG', 10, 10, 30, 12)
+        doc.addImage(logo || DEFAULT_LOGO, 'PNG', 10, 10, 30, 12)
       } catch (e) {
         console.warn('logo failed', e)
       }

@@ -65,6 +65,7 @@ The **Asset Creation** page lets you resize images for different publisher speci
 
 The **RPF Automation** page lets Account Managers manage Reward Programme Forms stored in the `rpf_forms` table. After searching you can click **Create New RPF** below the search bar to start a blank form for a brand that doesn’t yet exist. Anyone can add rows or create a new draft, but only Account Managers (set `localStorage.setItem('role','Account Manager')`) can modify the fields and save changes. Each save increments the version and records the user’s email. A **Download PDF** button exports a branded PDF including the TRC logo and official wording.
 
+When available, the page fetches `TRC-Logo.png` from the `knowledge_base` bucket so the PDF shows the official logo.
 ## Semantic Queries
 
 When you ask questions like "How many retailers are active in the United States?" the API
