@@ -8,6 +8,13 @@ export default function RPFAutomation() {
   const [results, setResults] = useState([])
   const [selected, setSelected] = useState(null)
   const [tableRows, setTableRows] = useState([])
+  const defaultColumns = [
+    'reward_programme',
+    'commission',
+    'offer_period',
+    'mids_descriptors',
+    'comments'
+  ]
   const [form, setForm] = useState({
     rpf_name: '',
     go_live_date: '',
@@ -76,20 +83,25 @@ export default function RPFAutomation() {
   }
 
   function addRow() {
-    const cols = tableRows[0] ? Object.keys(tableRows[0]) : ['Partner', 'Offer']
+    const cols = tableRows[0] ? Object.keys(tableRows[0]) : defaultColumns
     const row = {}
-    cols.forEach(c => { row[c] = '' })
+    cols.forEach(c => {
+      row[c] = ''
+    })
     setTableRows([...tableRows, row])
   }
 
   async function saveRpf() {
     if (!supabase || !selected) return
     if (!form.rpf_name) { alert('RPF name required'); return }
+    const email =
+      typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
     const updated = {
       ...form,
       table_data: tableRows,
       version: (selected.version || 1) + 1,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      last_updated_by: email
     }
     const { data, error } = await supabase
       .from('rpf_forms')
@@ -108,27 +120,55 @@ export default function RPFAutomation() {
   function downloadPdf() {
     if (!selected) return
     const doc = new jsPDF()
+    const today = new Date().toLocaleDateString()
     doc.setFontSize(16)
-    doc.text(form.rpf_name, 10, 10)
+    doc.text(`${form.rpf_name} Reward Programme`, 10, 10)
     doc.setFontSize(12)
-    let y = 20
+    doc.text(`Reward Programme Form dated ${today}`, 10, 18)
+    doc.text(`Go Live Date: ${form.go_live_date || ''}`, 10, 26)
+    let y = 34
+    const intro =
+      'This Reward Programme Form is subject to the terms and conditions of the Master General Service Agreement (MGSA) available at https://therewardcollection.com/master-general-service-agreement/ and the terms and conditions of the Insertion Order entered into by and between The Reward Collection Ltd and the Retail Partner (together, the "Agreement"), effective as of the Effective Date. This Reward Programme Form is subject to change from time to time. The company will issue the Retail Partner with a new Reward Programme Form each time any changes are made. The revised Reward Programme Form shall form part of the Agreement between the parties.'
+    const introLines = doc.splitTextToSize(intro, 180)
+    doc.text(introLines, 10, y)
+    y += introLines.length * 6 + 4
     const info = [
-      `Go Live Date: ${form.go_live_date || ''}`,
-      `Summary: ${form.summary || ''}`,
-      `Current Offers: ${form.current_offers || ''}`,
-      `Live Reward Programmes: ${form.live_reward_programmes || ''}`,
-      `Included MIDs: ${form.included_mids || ''}`,
-      `Excluded MIDs: ${form.excluded_mids || ''}`
+      ['Summary', form.summary],
+      ['Current Offer(s)', form.current_offers],
+      ['Live Reward Programmes', form.live_reward_programmes],
+      ['Included MIDs/Descriptors', form.included_mids],
+      ['Excluded MIDs/Descriptors', form.excluded_mids]
     ]
-    info.forEach(txt => {
-      const lines = doc.splitTextToSize(txt, 180)
-      doc.text(lines, 10, y)
-      y += lines.length * 6
+    info.forEach(([label, text]) => {
+      doc.text(`${label}:`, 10, y)
+      const lines = doc.splitTextToSize(text || '', 180)
+      doc.text(lines, 10, y + 6)
+      y += lines.length * 6 + 10
     })
     if (tableRows.length) {
-      const headers = [Object.keys(tableRows[0])]
-      const data = tableRows.map(r => headers[0].map(h => r[h] || ''))
-      autoTable(doc, { head: headers, body: data, startY: y + 4 })
+      const headers = [
+        [
+          'Reward Programme',
+          'Commission',
+          'Offer Period',
+          'MIDs / Descriptors',
+          'Comments'
+        ]
+      ]
+      const data = tableRows.map((r) => [
+        r.reward_programme || '',
+        r.commission || '',
+        r.offer_period || '',
+        r.mids_descriptors || '',
+        r.comments || ''
+      ])
+      autoTable(doc, {
+        head: headers,
+        body: data,
+        startY: y,
+        headStyles: { fillColor: [22, 49, 101], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 245, 245] }
+      })
     }
     doc.save(`${form.rpf_name || 'rpf'}.pdf`)
   }
