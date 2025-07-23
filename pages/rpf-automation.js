@@ -104,13 +104,13 @@ useEffect(() => {
   }
 
   async function saveField(field, value) {
-    if (!supabase || !selected?.id || newMode) return
+    if (!supabase || !selected?.rpf_name || newMode) return
     const email =
       typeof window !== 'undefined' ? localStorage.getItem('email') || '' : ''
     const { data, error } = await supabase
       .from('rpf_forms')
       .update({ [field]: value, updated_at: new Date().toISOString(), last_updated_by: email })
-      .eq('id', selected.id)
+      .eq('rpf_name', selected.rpf_name)
       .select()
       .single()
     if (!error && data) setSelected(data)
@@ -156,7 +156,6 @@ useEffect(() => {
     const base = {
       ...form,
       go_live_date: form.go_live_date || null,
-      table_data: tableRows,
       updated_at: new Date().toISOString(),
       last_updated_by: email
     }
@@ -167,11 +166,11 @@ useEffect(() => {
         .insert([{ ...base, version: 1 }])
         .select()
         .single()
-    } else if (selected && selected.id) {
+    } else if (selected && selected.rpf_name) {
       res = await supabase
         .from('rpf_forms')
         .update({ ...base, version: (selected.version || 1) + 1 })
-        .eq('id', selected.id)
+        .eq('rpf_name', selected.rpf_name)
         .select()
         .single()
     }
@@ -293,8 +292,9 @@ useEffect(() => {
                     type="text"
                     value={form.rpf_name}
                     onChange={(e) => updateForm('rpf_name', e.target.value)}
-                    onBlur={(e) => saveField('rpf_name', e.target.value)}
+                    onBlur={(e) => newMode && saveField('rpf_name', e.target.value)}
                     style={{ marginLeft: 8 }}
+                    disabled={!newMode}
                   />
                 </label>
               </div>
