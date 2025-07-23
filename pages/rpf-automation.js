@@ -144,9 +144,9 @@ export default function RPFAutomation() {
   }
 
   function downloadPdf() {
-    if (!selected) return
-    const doc = new jsPDF()
-    doc.addImage(TRC_LOGO, 'SVG', 10, 10, 30, 12)
+    try {
+      const doc = new jsPDF()
+      doc.addImage(TRC_LOGO, 'SVG', 10, 10, 30, 12)
     let y = 26
     const today = new Date().toLocaleDateString()
     doc.setFontSize(16)
@@ -197,7 +197,11 @@ export default function RPFAutomation() {
         alternateRowStyles: { fillColor: [245, 245, 245] }
       })
     }
-    doc.save(`${form.rpf_name || 'rpf'}.pdf`)
+      doc.save(`${form.rpf_name || 'rpf'}.pdf`)
+    } catch (err) {
+      console.error('PDF error', err)
+      alert('Failed to generate PDF')
+    }
   }
 
   useEffect(() => { handleSearch() }, [])
@@ -218,11 +222,9 @@ export default function RPFAutomation() {
             />
             <button onClick={handleSearch}>Search</button>
           </div>
-          {isAM && (
-            <button onClick={newRpf} style={{ marginBottom: '1rem' }}>
-              Create New RPF
-            </button>
-          )}
+          <button onClick={newRpf} style={{ marginBottom: '1rem' }}>
+            Create New RPF
+          </button>
           {loading && <p>Loading...</p>}
           {results.map((r) => (
             <div
@@ -350,11 +352,9 @@ export default function RPFAutomation() {
                   </tbody>
                 </table>
               )}
-              {isAM && (
-                <button onClick={addRow} style={{ marginTop: '0.5rem' }}>
-                  Add Row
-                </button>
-              )}
+              <button onClick={addRow} style={{ marginTop: '0.5rem' }}>
+                Add Row
+              </button>
               <div style={{ marginTop: '1rem' }}>
                 {isAM && (
                   <button onClick={saveRpf}>Save</button>
