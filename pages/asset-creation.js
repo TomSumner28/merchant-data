@@ -1,15 +1,11 @@
 import { useState } from 'react'
 
 const SIZES = [
-  { label: '500x500', w: 500, h: 500 },
-  { label: '728x90', w: 728, h: 90 },
-  { label: '320x50', w: 320, h: 50 },
-  { label: '300x250', w: 300, h: 250 },
-  { label: '160x600', w: 160, h: 600 },
-  { label: '1200x628', w: 1200, h: 628 },
-  { label: '600x200', w: 600, h: 200 },
-  { label: '128x128', w: 128, h: 128 },
-  { label: '32x32', w: 32, h: 32 }
+  { label: '360x360 - Fidel', w: 360, h: 360 },
+  { label: '260x200 - Logo', w: 260, h: 200 },
+  { label: '450x300 - Small Banner', w: 450, h: 300 },
+  { label: '2100x1400 - Large Banner', w: 2100, h: 1400 },
+  { label: '1125x960 - Lifestyle image', w: 1125, h: 960 }
 ]
 
 async function resizeImage(file, width, height) {
@@ -27,6 +23,37 @@ async function resizeImage(file, width, height) {
 }
 
 export default function AssetCreation() {
+  const [siteUrl, setSiteUrl] = useState('')
+  const [retrieved, setRetrieved] = useState([])
+  const [retrievalSize, setRetrievalSize] = useState(SIZES[0].label)
+
+  const fetchImages = async () => {
+    if (!siteUrl) return
+    try {
+      const res = await fetch(`/api/fetch-images?url=${encodeURIComponent(siteUrl)}`)
+      const data = await res.json()
+      setRetrieved(data.images || [])
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const downloadRetrieved = async () => {
+    const size = SIZES.find((s) => s.label === retrievalSize)
+    for (const [i, url] of retrieved.entries()) {
+      try {
+        const resp = await fetch(url)
+        const blob = await resp.blob()
+        const resized = await resizeImage(blob, size.w, size.h)
+        const dl = document.createElement('a')
+        dl.href = URL.createObjectURL(resized)
+        dl.download = `image_${i + 1}.jpg`
+        dl.click()
+      } catch (e) {
+        console.error('download failed', e)
+      }
+    }
+  }
   const [singleFile, setSingleFile] = useState(null)
   const [singleSize, setSingleSize] = useState(SIZES[0].label)
   const [singleUrl, setSingleUrl] = useState('')
@@ -65,6 +92,49 @@ export default function AssetCreation() {
   return (
     <div className="content">
       <h1 style={{ color: 'var(--accent)' }}>Asset Creation</h1>
+
+      <div className="card">
+        <h2>Asset Retrieval</h2>
+        <input
+          type="text"
+          value={siteUrl}
+          onChange={(e) => setSiteUrl(e.target.value)}
+          placeholder="https://example.com"
+          style={{ width: '60%', marginRight: '1rem' }}
+        />
+        <button onClick={fetchImages}>Fetch Images</button>
+        {retrieved.length > 0 && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <label>
+              Size:
+              <select
+                value={retrievalSize}
+                onChange={(e) => setRetrievalSize(e.target.value)}
+                style={{ marginLeft: 8 }}
+              >
+                {SIZES.map((s) => (
+                  <option key={s.label} value={s.label}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button onClick={downloadRetrieved} style={{ marginLeft: '1rem' }}>
+              Download Resized Images
+            </button>
+            <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '1rem' }}>
+              {retrieved.map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt={`retrieved-${i}`}
+                  style={{ width: 100, height: 'auto', marginRight: '0.5rem' }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="card">
         <h2>Single Image</h2>

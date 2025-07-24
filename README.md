@@ -63,6 +63,8 @@ The homepage also shows a **Weekly Company Update**. Admins can enter bullet poi
 
 The **Asset Creation** page lets you resize images for different publisher specifications. Drag and drop files or use the file picker for single or batch uploads, choose a preset size and download the resized results. Images are resampled with high-quality smoothing so the resized banners stay sharp and free from pixelation. All processing happens in the browser so you can quickly create banners in common dimensions.
 
+An additional **Asset Retrieval** tool lets you enter a retailer website and fetch up to four images from that page. Select one of the preset sizes (360x360 Fidel, 260x200 Logo, 450x300 Small Banner, 2100x1400 Large Banner or 1125x960 Lifestyle image) and download resized copies of all retrieved assets in a single click.
+
 The **RPF Automation** page lets Account Managers manage Reward Programme Forms stored in the `rpf_forms` table. After searching you can click **Create New RPF** below the search bar to start a blank form for a brand that doesn’t yet exist. Account Managers may update any field at any time—click **Save** to overwrite the stored record. Use **Add Row** beneath the table to append a spacious row for additional reward programmes. Each save writes the entire table JSON back to Supabase, increments the version and records the user’s email. A **Download PDF** button exports a branded PDF including the TRC logo and official wording.
 
 When available, the page fetches `TRC-Logo.png` from the `knowledge_base` bucket so the PDF shows the official logo.
